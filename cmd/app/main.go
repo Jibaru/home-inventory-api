@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/database"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/http"
 	"log"
 	"strconv"
@@ -13,5 +14,23 @@ func main() {
 		return
 	}
 
-	http.RunServer(config.AppHost, strconv.Itoa(config.AppPort))
+	db, err := database.CreateConnection(
+		database.DBConfig{
+			Name:     config.DatabaseName,
+			Host:     config.DatabaseHost,
+			Port:     config.DatabasePort,
+			Username: config.DatabaseUsername,
+			Password: config.DatabasePassword,
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	http.RunServer(
+		config.AppHost,
+		strconv.Itoa(config.AppPort),
+		db,
+	)
 }
