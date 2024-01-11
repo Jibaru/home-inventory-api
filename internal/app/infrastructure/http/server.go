@@ -1,17 +1,21 @@
 package http
 
 import (
+	"github.com/jibaru/home-inventory-api/m/internal/app/application/services"
+	"github.com/jibaru/home-inventory-api/m/internal/app/domain/dao"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/controllers"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"gorm.io/gorm"
 )
 
-const (
-	ApiVersion = "0.0.1"
-)
-
-func RunServer(host, port string) {
-	healthController := controllers.NewHealthController(ApiVersion)
+func RunServer(
+	host, port string,
+	db *gorm.DB,
+) {
+	versionDAO := &dao.VersionDAO{DB: db}
+	versionService := services.NewVersionService(versionDAO)
+	healthController := controllers.NewHealthController(versionService)
 
 	e := echo.New()
 	e.Use(middleware.Logger())
