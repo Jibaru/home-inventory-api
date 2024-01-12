@@ -14,13 +14,19 @@ func RunServer(
 	db *gorm.DB,
 ) {
 	versionDAO := &dao.VersionDAO{DB: db}
+	userDAO := dao.UserDAO{DB: db}
+
+	userService := services.NewUserService(userDAO)
 	versionService := services.NewVersionService(versionDAO)
+
 	healthController := controllers.NewHealthController(versionService)
+	signOnController := controllers.NewSignOnController(userService)
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 
 	api := e.Group("/api/v1")
 	api.GET("/", healthController.Handle)
+	api.POST("/users", signOnController.Handle)
 	e.Logger.Fatal(e.Start(host + ":" + port))
 }
