@@ -2,8 +2,8 @@ package services
 
 import (
 	"errors"
-	"github.com/jibaru/home-inventory-api/m/internal/app/domain/dao"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
+	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 )
 
 var (
@@ -11,19 +11,19 @@ var (
 )
 
 type VersionService struct {
-	versionDAO *dao.VersionDAO
+	versionRepository repositories.VersionRepository
 }
 
-func NewVersionService(versionDAO *dao.VersionDAO) *VersionService {
+func NewVersionService(versionRepository repositories.VersionRepository) *VersionService {
 	return &VersionService{
-		versionDAO,
+		versionRepository,
 	}
 }
 
 func (s *VersionService) GetLatestVersion() (*entities.Version, error) {
-	version, err := s.versionDAO.GetLatest()
+	version, err := s.versionRepository.GetLatest()
 
-	if err != nil && errors.Is(err, dao.ErrVersionNotFound) {
+	if err != nil && errors.Is(err, repositories.ErrVersionNotFound) {
 		return nil, ErrVersionNotSet
 	}
 
