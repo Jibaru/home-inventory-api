@@ -2,8 +2,8 @@ package http
 
 import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/application/services"
-	"github.com/jibaru/home-inventory-api/m/internal/app/domain/dao"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/controllers"
+	repositories "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
@@ -13,11 +13,11 @@ func RunServer(
 	host, port string,
 	db *gorm.DB,
 ) {
-	versionDAO := &dao.VersionDAO{DB: db}
-	userDAO := dao.UserDAO{DB: db}
+	versionRepository := repositories.NewVersionRepository(db)
+	userRepository := repositories.NewUserRepository(db)
 
-	userService := services.NewUserService(userDAO)
-	versionService := services.NewVersionService(versionDAO)
+	userService := services.NewUserService(userRepository)
+	versionService := services.NewVersionService(versionRepository)
 
 	healthController := controllers.NewHealthController(versionService)
 	signOnController := controllers.NewSignOnController(userService)
