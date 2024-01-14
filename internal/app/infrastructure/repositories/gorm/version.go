@@ -17,10 +17,6 @@ func NewVersionRepository(db *gorm.DB) *VersionRepository {
 	}
 }
 
-func (r *VersionRepository) Create(version entities.Version) {
-	r.db.Create(&version)
-}
-
 func (r *VersionRepository) GetLatest() (*entities.Version, error) {
 	version := &entities.Version{}
 	err := r.db.First(version).Error
