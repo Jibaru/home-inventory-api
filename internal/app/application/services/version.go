@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	ErrVersionNotSet = errors.New("current version is not set")
+	ErrVersionNotSet          = errors.New("current version is not set")
+	ErrCanNotGetLatestVersion = errors.New("can not get latest version")
 )
 
 type VersionService struct {
@@ -25,6 +26,8 @@ func (s *VersionService) GetLatestVersion() (*entities.Version, error) {
 
 	if err != nil && errors.Is(err, repositories.ErrVersionNotFound) {
 		return nil, ErrVersionNotSet
+	} else if err != nil {
+		return nil, ErrCanNotGetLatestVersion
 	}
 
 	return version, nil
