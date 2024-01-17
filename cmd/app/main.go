@@ -5,6 +5,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/http"
 	"log"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -31,6 +32,8 @@ func main() {
 	http.RunServer(
 		config.AppHost,
 		strconv.Itoa(config.AppPort),
+		config.JwtSecret,
+		time.Duration(config.JwtDuration)*time.Hour,
 		db,
 	)
 }
