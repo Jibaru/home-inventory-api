@@ -55,3 +55,18 @@ func (s *AuthService) Authenticate(email, password string) (
 func (s *AuthService) GenerateToken(user *entities.User) (string, error) {
 	return s.tokenGenerator.GenerateToken(user.ID, user.Email)
 }
+
+func (s *AuthService) ParseAuthentication(token string) (
+	*struct {
+		ID    string
+		Email string
+	},
+	error,
+) {
+	data, err := s.tokenGenerator.ParseToken(token)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
