@@ -12,6 +12,8 @@ type AppConfig struct {
 	DatabasePort     int    `mapstructure:"DB_PORT"`
 	DatabaseUsername string `mapstructure:"DB_USERNAME"`
 	DatabasePassword string `mapstructure:"DB_PASSWORD"`
+	JwtSecret        string `mapstructure:"JWT_SECRET"`
+	JwtDuration      int    `mapstructure:"JWT_DURATION"`
 }
 
 func ReadConfig() (*AppConfig, error) {
