@@ -2,7 +2,7 @@ package services
 
 import (
 	"errors"
-	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
+	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/stub"
 	"github.com/labstack/gommon/random"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -10,17 +10,8 @@ import (
 	"time"
 )
 
-type mockUserRepository struct {
-	mock.Mock
-}
-
-func (m *mockUserRepository) Create(user *entities.User) error {
-	args := m.Called(user)
-	return args.Error(0)
-}
-
 func TestCreateUser(t *testing.T) {
-	mockRepo := new(mockUserRepository)
+	mockRepo := new(stub.UserRepositoryMock)
 	userService := NewUserService(mockRepo)
 
 	email := "test@example.com"
@@ -40,7 +31,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestCreateUserErrorInRepository(t *testing.T) {
-	mockRepo := new(mockUserRepository)
+	mockRepo := new(stub.UserRepositoryMock)
 	userService := NewUserService(mockRepo)
 
 	email := "test@example.com"

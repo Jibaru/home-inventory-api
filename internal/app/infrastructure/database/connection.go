@@ -16,7 +16,7 @@ type DBConfig struct {
 
 func (c DBConfig) DSN() string {
 	return fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s",
+		"%s:%s@tcp(%s:%d)/%s?parseTime=true",
 		c.Username,
 		c.Password,
 		c.Host,

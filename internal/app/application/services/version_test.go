@@ -5,27 +5,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
+	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/stub"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"testing"
 )
 
-type mockVersionRepository struct {
-	mock.Mock
-}
-
-func (m *mockVersionRepository) GetLatest() (*entities.Version, error) {
-	args := m.Called()
-
-	if args.Get(0) != nil {
-		return args.Get(0).(*entities.Version), args.Error(1)
-	}
-
-	return nil, args.Error(1)
-}
-
 func TestGetLatestVersion(t *testing.T) {
-	mockRepo := new(mockVersionRepository)
+	mockRepo := new(stub.VersionRepositoryMock)
 	versionService := NewVersionService(mockRepo)
 
 	expectedVersion := &entities.Version{Value: "1.0.0", ID: uuid.NewString()}
@@ -39,7 +25,7 @@ func TestGetLatestVersion(t *testing.T) {
 }
 
 func TestGetLatestVersionErrorNotFound(t *testing.T) {
-	mockRepo := new(mockVersionRepository)
+	mockRepo := new(stub.VersionRepositoryMock)
 	versionService := NewVersionService(mockRepo)
 
 	mockRepo.On("GetLatest").Return(nil, repositories.ErrVersionNotFound).Once()
@@ -53,7 +39,7 @@ func TestGetLatestVersionErrorNotFound(t *testing.T) {
 }
 
 func TestGetLatestVersionErrorCanNotGetLatestVersion(t *testing.T) {
-	mockRepo := new(mockVersionRepository)
+	mockRepo := new(stub.VersionRepositoryMock)
 	versionService := NewVersionService(mockRepo)
 
 	mockRepo.On("GetLatest").Return(nil, errors.New("repository error")).Once()
