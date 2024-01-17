@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"github.com/google/uuid"
 	tokenstub "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/auth/stub"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/stub"
 	"testing"
@@ -109,6 +110,53 @@ func TestAuthenticateErrorInTokenGenerator(t *testing.T) {
 	assert.Nil(t, result)
 	assert.Error(t, err)
 	assert.EqualError(t, err, "can not authenticate")
+	userRepositoryMock.AssertExpectations(t)
+	tokenGeneratorMock.AssertExpectations(t)
+}
+
+func TestParseAuthentication(t *testing.T) {
+	userRepositoryMock := new(stub.UserRepositoryMock)
+	tokenGeneratorMock := new(tokenstub.TokenGeneratorMock)
+
+	authService := NewAuthService(userRepositoryMock, tokenGeneratorMock)
+
+	token := "valid_token"
+	expectedResult := &struct {
+		ID    string
+		Email string
+	}{
+		uuid.NewString(),
+		"test@email.com",
+	}
+
+	tokenGeneratorMock.On("ParseToken", token).
+		Return(expectedResult, nil)
+
+	data, err := authService.ParseAuthentication(token)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, data)
+	assert.Equal(t, expectedResult.ID, data.ID)
+	assert.Equal(t, expectedResult.Email, data.Email)
+	userRepositoryMock.AssertExpectations(t)
+	tokenGeneratorMock.AssertExpectations(t)
+}
+
+func TestParseAuthenticationError(t *testing.T) {
+	userRepositoryMock := new(stub.UserRepositoryMock)
+	tokenGeneratorMock := new(tokenstub.TokenGeneratorMock)
+
+	authService := NewAuthService(userRepositoryMock, tokenGeneratorMock)
+
+	token := "invalid_token"
+
+	tokenGeneratorMock.On("ParseToken", token).
+		Return(nil, errors.New("token generator error"))
+
+	data, err := authService.ParseAuthentication(token)
+
+	assert.Error(t, err)
+	assert.Nil(t, data)
 	userRepositoryMock.AssertExpectations(t)
 	tokenGeneratorMock.AssertExpectations(t)
 }
