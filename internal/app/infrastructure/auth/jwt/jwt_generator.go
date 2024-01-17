@@ -74,3 +74,24 @@ func (s *Generator) DecodeToken(tokenString string) (*CustomClaims, error) {
 		},
 	}, nil
 }
+
+func (s *Generator) ParseToken(token string) (
+	*struct {
+		ID    string
+		Email string
+	},
+	error,
+) {
+	claims, err := s.DecodeToken(token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &struct {
+		ID    string
+		Email string
+	}{
+		claims.ID,
+		claims.Email,
+	}, nil
+}

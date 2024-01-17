@@ -8,4 +8,11 @@ var (
 
 type TokenGenerator interface {
 	GenerateToken(id string, email string) (string, error)
+	ParseToken(token string) (
+		*struct {
+			ID    string
+			Email string
+		},
+		error,
+	)
 }

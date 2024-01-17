@@ -4,6 +4,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/application/services"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/auth/jwt"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/controllers"
+	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/http/middlewares"
 	repositories "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -31,12 +32,17 @@ func RunServer(
 	signOnController := controllers.NewSignOnController(userService)
 	logInController := controllers.NewLogInController(authService)
 
+	needsAuthMiddleware := middlewares.NewNeedsAuthMiddleware(authService)
+
 	e := echo.New()
 	e.Use(middleware.Logger())
 
 	api := e.Group("/api/v1")
-	api.GET("/", healthController.Handle)
-	api.POST("/users", signOnController.Handle)
 	api.POST("/login", logInController.Handle)
+	api.POST("/users", signOnController.Handle)
+
+	authApi := api.Group("", needsAuthMiddleware.Process)
+	authApi.GET("/", healthController.Handle)
+
 	e.Logger.Fatal(e.Start(host + ":" + port))
 }
