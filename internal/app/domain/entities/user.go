@@ -46,6 +46,11 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
+func (u *User) HasEqualPassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	return err == nil
+}
+
 func validateEmail(email string) error {
 	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	if ok, _ := regexp.MatchString(emailRegex, email); !ok {
