@@ -14,7 +14,7 @@ func TestDSN(t *testing.T) {
 		Password: "password",
 	}
 
-	expectedDSN := "test:password@tcp(localhost:3306)/test_db"
+	expectedDSN := "test:password@tcp(localhost:3306)/test_db?parseTime=true"
 	actualDSN := dbConfig.DSN()
 
 	assert.Equal(t, expectedDSN, actualDSN)
