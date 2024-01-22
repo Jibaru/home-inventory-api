@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestUpload(t *testing.T) {
+func TestFileManagerUpload(t *testing.T) {
 	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
 	secretKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
 	region := os.Getenv("AWS_REGION")
@@ -38,7 +38,7 @@ func TestUpload(t *testing.T) {
 	assert.NotEmpty(t, id)
 }
 
-func TestGenerateUrl(t *testing.T) {
+func TestFileManagerGenerateUrl(t *testing.T) {
 	bucketName := "bucket-test"
 	id := uuid.NewString()
 	extension := ".png"
@@ -46,8 +46,7 @@ func TestGenerateUrl(t *testing.T) {
 	expectedUrl := fmt.Sprintf("https://%s.s3.amazonaws.com/%s%s",
 		bucketName,
 		id,
-		extension,
-	)
+		extension)
 
 	manager := NewFileManager(uuid.NewString(), uuid.NewString(), random.String(8), bucketName)
 
