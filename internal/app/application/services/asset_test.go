@@ -14,19 +14,7 @@ import (
 	"testing"
 )
 
-type MockEntity struct {
-	ID string
-}
-
-func (e *MockEntity) EntityID() string {
-	return e.ID
-}
-
-func (e *MockEntity) EntityName() string {
-	return "mock_entity"
-}
-
-func TestCreateFromFile(t *testing.T) {
+func TestAssetServiceCreateFromFile(t *testing.T) {
 	assetRepository := &stub.AssetRepositoryMock{}
 	fileManager := &serviceStubs.FileManagerMock{}
 	service := NewAssetService(fileManager, assetRepository)
@@ -40,7 +28,7 @@ func TestCreateFromFile(t *testing.T) {
 	info, err := tempFile.Stat()
 	assert.NoError(t, err)
 
-	entity := &MockEntity{uuid.NewString()}
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
 	fileID := uuid.NewString()
 
 	assetRepository.On("Create", mock.AnythingOfType("*entities.Asset")).
@@ -65,7 +53,7 @@ func TestCreateFromFile(t *testing.T) {
 	fileManager.AssertExpectations(t)
 }
 
-func TestCreateFromFileErrorFromFileManager(t *testing.T) {
+func TestAssetServiceCreateFromFileErrorFromFileManager(t *testing.T) {
 	assetRepository := &stub.AssetRepositoryMock{}
 	fileManager := &serviceStubs.FileManagerMock{}
 	service := NewAssetService(fileManager, assetRepository)
@@ -74,7 +62,7 @@ func TestCreateFromFileErrorFromFileManager(t *testing.T) {
 	defer tempFile.Close()
 	assert.NoError(t, err)
 
-	entity := &MockEntity{uuid.NewString()}
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
 
 	fileManager.On("Upload", mock.AnythingOfType("*os.File")).
 		Return("", errors.New("file manager error"))
@@ -87,7 +75,7 @@ func TestCreateFromFileErrorFromFileManager(t *testing.T) {
 	fileManager.AssertExpectations(t)
 }
 
-func TestCreateFromFileErrorFromFileAssetRepository(t *testing.T) {
+func TestAssetServiceCreateFromFileErrorFromFileAssetRepository(t *testing.T) {
 	assetRepository := &stub.AssetRepositoryMock{}
 	fileManager := &serviceStubs.FileManagerMock{}
 	service := NewAssetService(fileManager, assetRepository)
@@ -96,7 +84,7 @@ func TestCreateFromFileErrorFromFileAssetRepository(t *testing.T) {
 	defer tempFile.Close()
 	assert.NoError(t, err)
 
-	entity := &MockEntity{uuid.NewString()}
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
 
 	assetRepository.On("Create", mock.AnythingOfType("*entities.Asset")).
 		Return(errors.New("repository error"))
@@ -111,7 +99,7 @@ func TestCreateFromFileErrorFromFileAssetRepository(t *testing.T) {
 	fileManager.AssertExpectations(t)
 }
 
-func TestGetUrl(t *testing.T) {
+func TestAssetServiceGetUrl(t *testing.T) {
 	assetRepository := &stub.AssetRepositoryMock{}
 	fileManager := &serviceStubs.FileManagerMock{}
 	service := NewAssetService(fileManager, assetRepository)
@@ -131,7 +119,7 @@ func TestGetUrl(t *testing.T) {
 	fileManager.AssertExpectations(t)
 }
 
-func TestGetByEntityWithoutPageFilter(t *testing.T) {
+func TestAssetServiceGetByEntityWithoutPageFilter(t *testing.T) {
 	assetRepository := &stub.AssetRepositoryMock{}
 	fileManager := &serviceStubs.FileManagerMock{}
 	service := NewAssetService(fileManager, assetRepository)
@@ -139,7 +127,7 @@ func TestGetByEntityWithoutPageFilter(t *testing.T) {
 	var expectedAssets []*entities.Asset
 	var repositoryPageFilter *repositories.PageFilter
 
-	entity := &MockEntity{uuid.NewString()}
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
 
 	assetRepository.On("FindByEntity", entity, repositoryPageFilter).
 		Return(expectedAssets, nil)
@@ -151,7 +139,7 @@ func TestGetByEntityWithoutPageFilter(t *testing.T) {
 	assetRepository.AssertExpectations(t)
 }
 
-func TestGetByEntityWithPageFilter(t *testing.T) {
+func TestAssetServiceGetByEntityWithPageFilter(t *testing.T) {
 	assetRepository := &stub.AssetRepositoryMock{}
 	fileManager := &serviceStubs.FileManagerMock{}
 	service := NewAssetService(fileManager, assetRepository)
@@ -166,7 +154,7 @@ func TestGetByEntityWithPageFilter(t *testing.T) {
 		Limit:  pageFilter.Size,
 	}
 
-	entity := &MockEntity{uuid.NewString()}
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
 
 	assetRepository.On("FindByEntity", entity, repositoryPageFilter).
 		Return(expectedAssets, nil)
@@ -178,7 +166,7 @@ func TestGetByEntityWithPageFilter(t *testing.T) {
 	assetRepository.AssertExpectations(t)
 }
 
-func TestGetByEntityErrorFromAssetRepository(t *testing.T) {
+func TestAssetServiceGetByEntityErrorFromAssetRepository(t *testing.T) {
 	assetRepository := &stub.AssetRepositoryMock{}
 	fileManager := &serviceStubs.FileManagerMock{}
 	service := NewAssetService(fileManager, assetRepository)
@@ -192,7 +180,7 @@ func TestGetByEntityErrorFromAssetRepository(t *testing.T) {
 		Limit:  pageFilter.Size,
 	}
 
-	entity := &MockEntity{uuid.NewString()}
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
 
 	assetRepository.On("FindByEntity", entity, repositoryPageFilter).
 		Return(nil, errors.New("repository error"))
