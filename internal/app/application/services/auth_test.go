@@ -3,15 +3,15 @@ package services
 import (
 	"errors"
 	"github.com/google/uuid"
-	tokenstub "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/auth/stub"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/stub"
+	tokenstub "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/stub"
 	"testing"
 
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAuthenticate(t *testing.T) {
+func TestAuthServiceAuthenticate(t *testing.T) {
 	userRepositoryMock := new(stub.UserRepositoryMock)
 	tokenGeneratorMock := new(tokenstub.TokenGeneratorMock)
 
@@ -40,7 +40,7 @@ func TestAuthenticate(t *testing.T) {
 	tokenGeneratorMock.AssertExpectations(t)
 }
 
-func TestAuthenticateInvalidCredentials(t *testing.T) {
+func TestAuthServiceAuthenticateErrorInvalidCredentials(t *testing.T) {
 	userRepositoryMock := new(stub.UserRepositoryMock)
 	tokenGeneratorMock := new(tokenstub.TokenGeneratorMock)
 
@@ -65,14 +65,14 @@ func TestAuthenticateInvalidCredentials(t *testing.T) {
 	tokenGeneratorMock.AssertNotCalled(t, "GenerateToken")
 }
 
-func TestAuthenticateErrorInRepository(t *testing.T) {
+func TestAuthServiceAuthenticateErrorInRepository(t *testing.T) {
 	userRepositoryMock := new(stub.UserRepositoryMock)
 	tokenGeneratorMock := new(tokenstub.TokenGeneratorMock)
 
 	authService := NewAuthService(userRepositoryMock, tokenGeneratorMock)
 
 	email := "test@example.com"
-	password := "TestPassword123"
+	password := "TestAuthServicePassword123"
 
 	userRepositoryMock.On("FindByEmail", email).
 		Return(nil, errors.New("repository error"))
@@ -87,7 +87,7 @@ func TestAuthenticateErrorInRepository(t *testing.T) {
 	tokenGeneratorMock.AssertNotCalled(t, "GenerateToken")
 }
 
-func TestAuthenticateErrorInTokenGenerator(t *testing.T) {
+func TestAuthServiceAuthenticateErrorInTokenGenerator(t *testing.T) {
 	userRepositoryMock := new(stub.UserRepositoryMock)
 	tokenGeneratorMock := new(tokenstub.TokenGeneratorMock)
 
@@ -114,7 +114,7 @@ func TestAuthenticateErrorInTokenGenerator(t *testing.T) {
 	tokenGeneratorMock.AssertExpectations(t)
 }
 
-func TestParseAuthentication(t *testing.T) {
+func TestAuthServiceParseAuthentication(t *testing.T) {
 	userRepositoryMock := new(stub.UserRepositoryMock)
 	tokenGeneratorMock := new(tokenstub.TokenGeneratorMock)
 
@@ -142,7 +142,7 @@ func TestParseAuthentication(t *testing.T) {
 	tokenGeneratorMock.AssertExpectations(t)
 }
 
-func TestParseAuthenticationError(t *testing.T) {
+func TestAuthServiceErrorParseAuthentication(t *testing.T) {
 	userRepositoryMock := new(stub.UserRepositoryMock)
 	tokenGeneratorMock := new(tokenstub.TokenGeneratorMock)
 

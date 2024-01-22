@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-func TestGenerateAndDecodeToken(t *testing.T) {
+func TestTokenGeneratorGenerateAndDecodeToken(t *testing.T) {
 	secret := "secret-key"
 	expirationTime := time.Hour
-	jwtGenerator := NewJwtGenerator(secret, expirationTime)
+	jwtGenerator := NewTokenGenerator(secret, expirationTime)
 
 	id := uuid.NewString()
 	email := "test@example.com"
@@ -28,10 +28,10 @@ func TestGenerateAndDecodeToken(t *testing.T) {
 	assert.WithinDuration(t, time.Now().Add(expirationTime), time.Unix(decodedClaims.ExpiresAt.Unix(), 0), 5*time.Second)
 }
 
-func TestParseToken(t *testing.T) {
+func TestTokenGeneratorParseToken(t *testing.T) {
 	secret := "secret-key"
 	expirationTime := time.Hour
-	jwtGenerator := NewJwtGenerator(secret, expirationTime)
+	jwtGenerator := NewTokenGenerator(secret, expirationTime)
 
 	id := uuid.NewString()
 	email := "test@example.com"

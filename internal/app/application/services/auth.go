@@ -2,19 +2,19 @@ package services
 
 import (
 	"errors"
-	"github.com/jibaru/home-inventory-api/m/internal/app/domain/auth"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
+	"github.com/jibaru/home-inventory-api/m/internal/app/domain/services"
 )
 
 type AuthService struct {
 	userRepository repositories.UserRepository
-	tokenGenerator auth.TokenGenerator
+	tokenGenerator services.TokenGenerator
 }
 
 func NewAuthService(
 	userRepository repositories.UserRepository,
-	tokenGenerator auth.TokenGenerator,
+	tokenGenerator services.TokenGenerator,
 ) *AuthService {
 	return &AuthService{
 		userRepository,

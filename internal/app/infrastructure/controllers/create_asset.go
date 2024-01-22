@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/application/services"
+	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/responses"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -21,18 +22,6 @@ type CreateAssetResponse struct {
 	EntityID   string `json:"entity_id"`
 	EntityName string `json:"entity_name"`
 	Url        string `json:"url"`
-}
-
-type FlattenUser struct {
-	ID string
-}
-
-func (e *FlattenUser) EntityID() string {
-	return e.ID
-}
-
-func (e *FlattenUser) EntityName() string {
-	return "user"
 }
 
 func NewCreateAssetController(
@@ -55,7 +44,7 @@ func (c *CreateAssetController) Handle(ctx echo.Context) error {
 
 	userID := ctx.Get("auth_id").(string)
 
-	asset, err := c.assetService.CreateFromFile(tempFile, &FlattenUser{userID})
+	asset, err := c.assetService.CreateFromFile(tempFile, entities.NewIdentifiableEntity(userID))
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, responses.NewMessageResponse(err.Error()))
 	}

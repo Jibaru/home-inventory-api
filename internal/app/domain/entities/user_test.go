@@ -26,27 +26,27 @@ func TestNewUser(t *testing.T) {
 	assert.WithinDuration(t, now, user.UpdatedAt, 10*time.Second)
 }
 
-func TestInvalidEmail(t *testing.T) {
+func TestNewUserErrorInvalidEmail(t *testing.T) {
 	invalidEmail := "invalidemail"
 	password := random.String(6, random.Numeric) + random.String(6, random.Alphabetic)
 
 	_, err := NewUser(invalidEmail, password)
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid email address")
+	assert.ErrorIs(t, err, ErrInvalidEmailAddress)
 }
 
-func TestEmailExceedsMaxLength(t *testing.T) {
+func TestNewUserErrorEmailExceedsMaxLength(t *testing.T) {
 	invalidEmail := random.String(101) + "@email.com"
 	password := random.String(6, random.Numeric) + random.String(6, random.Alphabetic)
 
 	_, err := NewUser(invalidEmail, password)
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "email exceeds maximum length of 100 characters")
+	assert.ErrorIs(t, err, ErrEmailExceedsMaxLengthOf100Chars)
 }
 
-func TestPasswordShouldHaveSixToOneHundredSize(t *testing.T) {
+func TestNewUserErrorPasswordMustBeBetween6And100Chars(t *testing.T) {
 	smallPassword := random.String(5)
 	giantPassword := random.String(101)
 
@@ -54,25 +54,25 @@ func TestPasswordShouldHaveSixToOneHundredSize(t *testing.T) {
 	_, err2 := NewUser("test@example.com", giantPassword)
 
 	assert.Error(t, err1)
-	assert.Contains(t, err1.Error(), "password must be between 6 and 100 characters")
+	assert.ErrorIs(t, err1, ErrPasswordMustBeBetween6And100Chars)
 	assert.Error(t, err2)
-	assert.Contains(t, err1.Error(), "password must be between 6 and 100 characters")
+	assert.ErrorIs(t, err1, ErrPasswordMustBeBetween6And100Chars)
 }
 
-func TestPasswordShouldHaveNumber(t *testing.T) {
+func TestNewUserErrorPasswordMustContainAtLeastOneNumber(t *testing.T) {
 	invalidPassword := random.String(6, random.Alphabetic)
 
 	_, err := NewUser("test@example.com", invalidPassword)
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "password must contain at least one letter and one number")
+	assert.ErrorIs(t, err, ErrPasswordMustContainAtLeastOneLetterAndOneNumber)
 }
 
-func TestPasswordShouldHaveLetter(t *testing.T) {
+func TestNewUserErrorPasswordMustContainAtLeastOneLetter(t *testing.T) {
 	invalidPassword := random.String(6, random.Numeric)
 
 	_, err := NewUser("test@example.com", invalidPassword)
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "password must contain at least one letter and one number")
+	assert.ErrorIs(t, err, ErrPasswordMustContainAtLeastOneLetterAndOneNumber)
 }

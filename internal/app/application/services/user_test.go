@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func TestCreateUser(t *testing.T) {
+func TestUserServiceCreateUser(t *testing.T) {
 	mockRepo := new(stub.UserRepositoryMock)
 	userService := NewUserService(mockRepo)
 
@@ -30,7 +30,7 @@ func TestCreateUser(t *testing.T) {
 	assert.WithinDuration(t, now, user.UpdatedAt, 10*time.Second)
 }
 
-func TestCreateUserErrorInRepository(t *testing.T) {
+func TestUserServiceCreateUserErrorInRepository(t *testing.T) {
 	mockRepo := new(stub.UserRepositoryMock)
 	userService := NewUserService(mockRepo)
 

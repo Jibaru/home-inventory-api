@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestGetLatestVersion(t *testing.T) {
+func TestVersionRepositoryGetLatestVersion(t *testing.T) {
 	db, dbMock := makeDBMock()
 	versionRepository := NewVersionRepository(db)
 
@@ -37,7 +37,7 @@ func TestGetLatestVersion(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestGetLatestVersionErrorVersionNotFound(t *testing.T) {
+func TestVersionRepositoryGetLatestVersionErrorVersionNotFound(t *testing.T) {
 	db, dbMock := makeDBMock()
 	versionRepository := NewVersionRepository(db)
 

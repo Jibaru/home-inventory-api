@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestGetLatestVersion(t *testing.T) {
+func TestVersionServiceGetLatestVersion(t *testing.T) {
 	mockRepo := new(stub.VersionRepositoryMock)
 	versionService := NewVersionService(mockRepo)
 
@@ -24,7 +24,7 @@ func TestGetLatestVersion(t *testing.T) {
 	assert.Equal(t, expectedVersion, version)
 }
 
-func TestGetLatestVersionErrorNotFound(t *testing.T) {
+func TestVersionServiceGetLatestVersionErrorNotFound(t *testing.T) {
 	mockRepo := new(stub.VersionRepositoryMock)
 	versionService := NewVersionService(mockRepo)
 
@@ -38,7 +38,7 @@ func TestGetLatestVersionErrorNotFound(t *testing.T) {
 	assert.Nil(t, version)
 }
 
-func TestGetLatestVersionErrorCanNotGetLatestVersion(t *testing.T) {
+func TestVersionServiceGetLatestVersionErrorCanNotGetLatestVersion(t *testing.T) {
 	mockRepo := new(stub.VersionRepositoryMock)
 	versionService := NewVersionService(mockRepo)
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestDSN(t *testing.T) {
+func TestDBConfigDSN(t *testing.T) {
 	dbConfig := DBConfig{
 		Name:     "test_db",
 		Host:     "localhost",
