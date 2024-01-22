@@ -2,11 +2,11 @@ package http
 
 import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/application/services"
-	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/auth/jwt"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/controllers"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/http/middlewares"
 	repositories "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/gorm"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/aws"
+	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
@@ -24,7 +24,7 @@ func RunServer(
 	s3BucketName string,
 	db *gorm.DB,
 ) {
-	tokenGenerator := jwt.NewJwtGenerator(jwtSecret, jwtDuration)
+	tokenGenerator := jwt.NewTokenGenerator(jwtSecret, jwtDuration)
 	fileManager := aws.NewFileManager(awsAccessKeyID, awsSecretAccessKey, awsRegion, s3BucketName)
 
 	assetRepository := repositories.NewAssetRepository(db)
