@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestCreateRoom(t *testing.T) {
+func TestRoomServiceCreateRoom(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	roomService := NewRoomService(roomRepository)
 
@@ -31,7 +31,7 @@ func TestCreateRoom(t *testing.T) {
 	roomRepository.AssertExpectations(t)
 }
 
-func TestCreateRoomError(t *testing.T) {
+func TestRoomServiceCreateRoomErrorInRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	roomService := NewRoomService(roomRepository)
 
