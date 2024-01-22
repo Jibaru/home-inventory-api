@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func TestCreateRoom(t *testing.T) {
+func TestRoomRepositoryCreateRoom(t *testing.T) {
 	db, dbMock := makeDBMock()
 	roomRepository := NewRoomRepository(db)
 
@@ -39,7 +39,7 @@ func TestCreateRoom(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestCreateRoomErrorCanNotCreateRoom(t *testing.T) {
+func TestRoomRepositoryCreateRoomErrorCanNotCreateRoom(t *testing.T) {
 	db, dbMock := makeDBMock()
 	roomRepository := NewRoomRepository(db)
 
