@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+var (
+	ErrInvalidEmailAddress                             = errors.New("invalid email address")
+	ErrEmailExceedsMaxLengthOf100Chars                 = errors.New("email exceeds maximum length of 100 characters")
+	ErrPasswordMustBeBetween6And100Chars               = errors.New("password must be between 6 and 100 characters")
+	ErrPasswordMustContainAtLeastOneLetterAndOneNumber = errors.New("password must contain at least one letter and one number")
+)
+
 type User struct {
 	ID        string
 	Email     string
@@ -54,11 +61,11 @@ func (u *User) HasEqualPassword(password string) bool {
 func validateEmail(email string) error {
 	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	if ok, _ := regexp.MatchString(emailRegex, email); !ok {
-		return errors.New("invalid email address")
+		return ErrInvalidEmailAddress
 	}
 
 	if len(email) > 100 {
-		return errors.New("email exceeds maximum length of 100 characters")
+		return ErrEmailExceedsMaxLengthOf100Chars
 	}
 
 	return nil
@@ -66,7 +73,7 @@ func validateEmail(email string) error {
 
 func validatePassword(password string) error {
 	if len(password) < 6 || len(password) > 100 {
-		return errors.New("password must be between 6 and 100 characters")
+		return ErrPasswordMustBeBetween6And100Chars
 	}
 
 	hasLetter := false
@@ -81,7 +88,7 @@ func validatePassword(password string) error {
 	}
 
 	if !hasLetter || !hasNumber {
-		return errors.New("password must contain at least one letter and one number")
+		return ErrPasswordMustContainAtLeastOneLetterAndOneNumber
 	}
 
 	return nil
