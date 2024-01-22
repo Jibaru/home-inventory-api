@@ -14,19 +14,7 @@ import (
 	"time"
 )
 
-type MockEntity struct {
-	ID string
-}
-
-func (e *MockEntity) EntityID() string {
-	return e.ID
-}
-
-func (e *MockEntity) EntityName() string {
-	return "mock_entity"
-}
-
-func TestCreateAsset(t *testing.T) {
+func TestAssetRepositoryCreateAsset(t *testing.T) {
 	db, dbMock := makeDBMock()
 	assetRepository := NewAssetRepository(db)
 
@@ -63,7 +51,7 @@ func TestCreateAsset(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestCreateAssetErrorCanNotCreateAsset(t *testing.T) {
+func TestAssetRepositoryCreateAssetErrorCanNotCreateAsset(t *testing.T) {
 	db, dbMock := makeDBMock()
 	assetRepository := NewAssetRepository(db)
 
@@ -101,13 +89,11 @@ func TestCreateAssetErrorCanNotCreateAsset(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestFindByEntity(t *testing.T) {
+func TestAssetRepositoryFindByEntity(t *testing.T) {
 	db, dbMock := makeDBMock()
 	assetRepository := NewAssetRepository(db)
 
-	entity := &MockEntity{
-		ID: uuid.NewString(),
-	}
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
 
 	expectedAsset := &entities.Asset{
 		ID:         uuid.NewString(),
@@ -159,13 +145,11 @@ func TestFindByEntity(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestFindByEntityWithPageFilter(t *testing.T) {
+func TestAssetRepositoryFindByEntityWithPageFilter(t *testing.T) {
 	db, dbMock := makeDBMock()
 	assetRepository := NewAssetRepository(db)
 
-	entity := &MockEntity{
-		ID: uuid.NewString(),
-	}
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
 
 	pageFilter := &repositories.PageFilter{
 		Offset: 1,
@@ -228,13 +212,11 @@ func TestFindByEntityWithPageFilter(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestFindByEntityErrorCanNotGetAssets(t *testing.T) {
+func TestAssetRepositoryFindByEntityErrorCanNotGetAssets(t *testing.T) {
 	db, dbMock := makeDBMock()
 	assetRepository := NewAssetRepository(db)
 
-	entity := &MockEntity{
-		ID: uuid.NewString(),
-	}
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
 
 	pageFilter := &repositories.PageFilter{
 		Offset: 1,
