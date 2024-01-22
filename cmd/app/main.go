@@ -34,6 +34,10 @@ func main() {
 		strconv.Itoa(config.AppPort),
 		config.JwtSecret,
 		time.Duration(config.JwtDuration)*time.Hour,
+		config.AwsAccessKeyID,
+		config.AwsSecretAccessKey,
+		config.AwsRegion,
+		config.S3BucketName,
 		db,
 	)
 }

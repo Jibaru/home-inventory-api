@@ -5,15 +5,19 @@ import (
 )
 
 type AppConfig struct {
-	AppHost          string `mapstructure:"APP_HOST"`
-	AppPort          int    `mapstructure:"APP_PORT"`
-	DatabaseName     string `mapstructure:"DB_NAME"`
-	DatabaseHost     string `mapstructure:"DB_HOST"`
-	DatabasePort     int    `mapstructure:"DB_PORT"`
-	DatabaseUsername string `mapstructure:"DB_USERNAME"`
-	DatabasePassword string `mapstructure:"DB_PASSWORD"`
-	JwtSecret        string `mapstructure:"JWT_SECRET"`
-	JwtDuration      int    `mapstructure:"JWT_DURATION"`
+	AppHost            string `mapstructure:"APP_HOST"`
+	AppPort            int    `mapstructure:"APP_PORT"`
+	DatabaseName       string `mapstructure:"DB_NAME"`
+	DatabaseHost       string `mapstructure:"DB_HOST"`
+	DatabasePort       int    `mapstructure:"DB_PORT"`
+	DatabaseUsername   string `mapstructure:"DB_USERNAME"`
+	DatabasePassword   string `mapstructure:"DB_PASSWORD"`
+	JwtSecret          string `mapstructure:"JWT_SECRET"`
+	JwtDuration        int    `mapstructure:"JWT_DURATION"`
+	AwsAccessKeyID     string `mapstructure:"AWS_ACCESS_KEY_ID"`
+	AwsSecretAccessKey string `mapstructure:"AWS_SECRET_ACCESS_KEY"`
+	AwsRegion          string `mapstructure:"AWS_REGION"`
+	S3BucketName       string `mapstructure:"S3_BUCKET_NAME"`
 }
 
 func ReadConfig() (*AppConfig, error) {
