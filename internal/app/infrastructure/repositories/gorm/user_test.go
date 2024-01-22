@@ -7,25 +7,13 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"regexp"
 	"testing"
 	"time"
 )
 
-func makeDBMock() (*gorm.DB, sqlmock.Sqlmock) {
-	dialector, dbMock, _ := sqlmock.New()
-	db, _ := gorm.Open(mysql.New(mysql.Config{
-		Conn:                      dialector,
-		DriverName:                "mysql",
-		SkipInitializeWithVersion: true,
-	}), &gorm.Config{})
-
-	return db, dbMock
-}
-
-func TestCreateUser(t *testing.T) {
+func TestUserRepositoryCreateUser(t *testing.T) {
 	db, dbMock := makeDBMock()
 	userRepository := NewUserRepository(db)
 
@@ -49,7 +37,7 @@ func TestCreateUser(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestCreateUserError(t *testing.T) {
+func TestUserRepositoryCreateUserError(t *testing.T) {
 	db, dbMock := makeDBMock()
 	userRepository := NewUserRepository(db)
 
@@ -73,7 +61,7 @@ func TestCreateUserError(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestFindByEmail(t *testing.T) {
+func TestUserRepositoryFindByEmail(t *testing.T) {
 	db, dbMock := makeDBMock()
 	userRepository := NewUserRepository(db)
 
@@ -112,7 +100,7 @@ func TestFindByEmail(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestFindByEmailErrorUserNotFound(t *testing.T) {
+func TestUserRepositoryFindByEmailErrorUserNotFound(t *testing.T) {
 	db, dbMock := makeDBMock()
 	userRepository := NewUserRepository(db)
 
