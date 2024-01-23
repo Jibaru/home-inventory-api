@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS rooms (
     id CHAR(36) NOT NULL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
     description VARCHAR(255) NULL,
     user_id CHAR(36) NOT NULL,
     created_at TIMESTAMP NOT NULL,
