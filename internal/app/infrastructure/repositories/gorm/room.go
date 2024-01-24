@@ -23,3 +23,16 @@ func (r *RoomRepository) Create(room *entities.Room) error {
 
 	return nil
 }
+
+func (r *RoomRepository) ExistsByID(id string) (bool, error) {
+	var count int64
+	err := r.db.Model(&entities.Room{}).
+		Where("id = ?", id).
+		Count(&count).
+		Error
+	if err != nil {
+		return false, repositories.ErrCanNotCheckIfRoomExistsByID
+	}
+
+	return count > 0, nil
+}
