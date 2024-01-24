@@ -65,3 +65,40 @@ func TestRoomRepositoryCreateRoomErrorCanNotCreateRoom(t *testing.T) {
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestRoomRepositoryExistsByID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	roomRepository := NewRoomRepository(db)
+
+	roomID := uuid.NewString()
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `rooms` WHERE id = ?")).
+		WithArgs(roomID).
+		WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(1))
+
+	exists, err := roomRepository.ExistsByID(roomID)
+
+	assert.NoError(t, err)
+	assert.True(t, exists)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestRoomRepositoryExistsByIDErrorCanNotCheckIfRoomExistsByID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	roomRepository := NewRoomRepository(db)
+
+	roomID := uuid.NewString()
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `rooms` WHERE id = ?")).
+		WithArgs(roomID).
+		WillReturnError(errors.New("database error"))
+
+	exists, err := roomRepository.ExistsByID(roomID)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrCanNotCheckIfRoomExistsByID)
+	assert.False(t, exists)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
