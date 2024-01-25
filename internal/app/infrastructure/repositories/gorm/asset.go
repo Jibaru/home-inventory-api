@@ -45,3 +45,11 @@ func (r *AssetRepository) FindByEntity(
 
 	return assets, nil
 }
+
+func (r *AssetRepository) Delete(id string) error {
+	if err := r.db.Delete(&entities.Asset{}, "id = ?", id).Error; err != nil {
+		return repositories.ErrCanNotDeleteAsset
+	}
+
+	return nil
+}
