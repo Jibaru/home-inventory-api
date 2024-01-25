@@ -241,3 +241,22 @@ func TestAssetRepositoryFindByEntityErrorCanNotGetAssets(t *testing.T) {
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestAssetRepositoryDelete(t *testing.T) {
+	db, dbMock := makeDBMock()
+	assetRepository := NewAssetRepository(db)
+
+	id := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `assets` WHERE id = ?")).
+		WithArgs(id).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	dbMock.ExpectCommit()
+
+	err := assetRepository.Delete(id)
+
+	assert.NoError(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
