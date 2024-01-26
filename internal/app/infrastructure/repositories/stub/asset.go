@@ -27,3 +27,8 @@ func (r *AssetRepositoryMock) FindByEntity(
 
 	return nil, args.Error(1)
 }
+
+func (r *AssetRepositoryMock) Delete(id string) error {
+	args := r.Called(id)
+	return args.Error(0)
+}

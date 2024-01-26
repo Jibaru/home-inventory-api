@@ -18,3 +18,8 @@ func (m *FileManagerMock) GenerateUrl(id string, extension string) string {
 	args := m.Called(id, extension)
 	return args.String(0)
 }
+
+func (m *FileManagerMock) Delete(id string, extension string) error {
+	args := m.Called(id, extension)
+	return args.Error(0)
+}

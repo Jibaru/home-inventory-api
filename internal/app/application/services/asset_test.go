@@ -191,3 +191,70 @@ func TestAssetServiceGetByEntityErrorFromAssetRepository(t *testing.T) {
 	assert.Nil(t, assets)
 	assetRepository.AssertExpectations(t)
 }
+
+func TestAssetServiceDelete(t *testing.T) {
+	assetRepository := &stub.AssetRepositoryMock{}
+	fileManager := &serviceStubs.FileManagerMock{}
+	service := NewAssetService(fileManager, assetRepository)
+
+	asset := &entities.Asset{
+		ID:        uuid.NewString(),
+		Extension: ".png",
+		FileID:    uuid.NewString(),
+	}
+
+	fileManager.On("Delete", asset.FileID, asset.Extension).
+		Return(nil)
+	assetRepository.On("Delete", asset.ID).
+		Return(nil)
+
+	err := service.Delete(asset)
+
+	assert.NoError(t, err)
+	assetRepository.AssertExpectations(t)
+	fileManager.AssertExpectations(t)
+}
+
+func TestAssetServiceDeleteErrorFromAssetRepository(t *testing.T) {
+	assetRepository := &stub.AssetRepositoryMock{}
+	fileManager := &serviceStubs.FileManagerMock{}
+	service := NewAssetService(fileManager, assetRepository)
+
+	asset := &entities.Asset{
+		ID:        uuid.NewString(),
+		Extension: ".png",
+		FileID:    uuid.NewString(),
+	}
+
+	fileManager.On("Delete", asset.FileID, asset.Extension).
+		Return(nil)
+	assetRepository.On("Delete", asset.ID).
+		Return(errors.New("repository error"))
+
+	err := service.Delete(asset)
+
+	assert.Error(t, err)
+	assetRepository.AssertExpectations(t)
+	fileManager.AssertExpectations(t)
+}
+
+func TestAssetServiceDeleteErrorFromFileManager(t *testing.T) {
+	assetRepository := &stub.AssetRepositoryMock{}
+	fileManager := &serviceStubs.FileManagerMock{}
+	service := NewAssetService(fileManager, assetRepository)
+
+	asset := &entities.Asset{
+		ID:        uuid.NewString(),
+		Extension: ".png",
+		FileID:    uuid.NewString(),
+	}
+
+	fileManager.On("Delete", asset.FileID, asset.Extension).
+		Return(errors.New("file manager error"))
+
+	err := service.Delete(asset)
+
+	assert.Error(t, err)
+	assetRepository.AssertExpectations(t)
+	fileManager.AssertExpectations(t)
+}
