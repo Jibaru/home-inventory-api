@@ -23,3 +23,13 @@ func (r *ItemRepository) Create(item *entities.Item) error {
 
 	return nil
 }
+
+func (r *ItemRepository) GetByID(id string) (*entities.Item, error) {
+	var item entities.Item
+
+	if err := r.db.First(&item, "id = ?", id).Error; err != nil {
+		return nil, repositories.ErrItemRepositoryItemNotFound
+	}
+
+	return &item, nil
+}

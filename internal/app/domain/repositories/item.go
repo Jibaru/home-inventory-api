@@ -6,9 +6,11 @@ import (
 )
 
 var (
-	ErrCanNotCreateItem = errors.New("can not create item")
+	ErrCanNotCreateItem           = errors.New("can not create item")
+	ErrItemRepositoryItemNotFound = errors.New("item not found")
 )
 
 type ItemRepository interface {
 	Create(item *entities.Item) error
+	GetByID(id string) (*entities.Item, error)
 }

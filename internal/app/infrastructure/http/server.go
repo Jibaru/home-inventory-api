@@ -40,7 +40,7 @@ func RunServer(
 	userService := services.NewUserService(userRepository)
 	versionService := services.NewVersionService(versionRepository)
 	roomService := services.NewRoomService(roomRepository)
-	boxService := services.NewBoxService(boxRepository, roomRepository)
+	boxService := services.NewBoxService(boxRepository, itemRepository, roomRepository)
 	itemService := services.NewItemService(itemRepository, itemKeywordRepository, assetService)
 
 	healthController := controllers.NewHealthController(versionService)
@@ -50,6 +50,7 @@ func RunServer(
 	createAssetController := controllers.NewCreateAssetController(assetService)
 	createBoxController := controllers.NewCreateBoxController(boxService)
 	createItemController := controllers.NewCreateItemController(itemService)
+	addItemIntoBoxController := controllers.NewAddItemIntoBoxController(boxService)
 
 	needsAuthMiddleware := middlewares.NewNeedsAuthMiddleware(authService)
 
@@ -66,6 +67,7 @@ func RunServer(
 	authApi.POST("/rooms/:roomID/boxes", createBoxController.Handle)
 	authApi.POST("/assets", createAssetController.Handle)
 	authApi.POST("/items", createItemController.Handle)
+	authApi.POST("/boxes/:boxID/items", addItemIntoBoxController.Handle)
 
 	e.Logger.Fatal(e.Start(host + ":" + port))
 }
