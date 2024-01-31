@@ -11,6 +11,7 @@ var (
 	ErrBoxRepositoryCanBotCreateBoxItem        = errors.New("can not create box item")
 	ErrBoxRepositoryCanNotUpdateBoxItem        = errors.New("can not update box item")
 	ErrBoxRepositoryCanNotCreateBoxTransaction = errors.New("can not create box transaction")
+	ErrBoxRepositoryCanNotDeleteBoxItem        = errors.New("can not delete box item")
 )
 
 type BoxRepository interface {
@@ -19,4 +20,5 @@ type BoxRepository interface {
 	CreateBoxItem(boxItem *entities.BoxItem) error
 	UpdateBoxItem(boxItem *entities.BoxItem) error
 	CreateBoxTransaction(boxTransaction *entities.BoxTransaction) error
+	DeleteBoxItem(boxID string, itemID string) error
 }

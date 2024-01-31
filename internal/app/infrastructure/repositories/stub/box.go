@@ -38,3 +38,8 @@ func (m *BoxRepositoryMock) CreateBoxTransaction(boxTransaction *entities.BoxTra
 	args := m.Called(boxTransaction)
 	return args.Error(0)
 }
+
+func (m *BoxRepositoryMock) DeleteBoxItem(boxID string, itemID string) error {
+	args := m.Called(boxID, itemID)
+	return args.Error(0)
+}

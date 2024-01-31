@@ -277,3 +277,195 @@ func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnGetBoxItem(t *testing.T) 
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 }
+
+func TestBoxServiceRemoveItemFromBoxDeleteBoxItem(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	itemID := uuid.NewString()
+	quantity := 10.0
+
+	itemRepository.On("GetByID", itemID).
+		Return(&entities.Item{
+			ID: itemID,
+		}, nil)
+	boxRepository.On("GetBoxItem", boxID, itemID).
+		Return(&entities.BoxItem{
+			BoxID:    boxID,
+			ItemID:   itemID,
+			Quantity: 10.0,
+		}, nil)
+	boxRepository.On("DeleteBoxItem", boxID, itemID).
+		Return(nil)
+	boxRepository.On("CreateBoxTransaction", mock.AnythingOfType("*entities.BoxTransaction")).
+		Return(nil)
+
+	err := boxService.RemoveItemFromBox(quantity, boxID, itemID)
+
+	time.Sleep(2 * time.Second)
+
+	assert.NoError(t, err)
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceRemoveItemFromBoxUpdateBoxItem(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	itemID := uuid.NewString()
+	quantity := 5.0
+
+	itemRepository.On("GetByID", itemID).
+		Return(&entities.Item{
+			ID: itemID,
+		}, nil)
+	boxRepository.On("GetBoxItem", boxID, itemID).
+		Return(&entities.BoxItem{
+			BoxID:    boxID,
+			ItemID:   itemID,
+			Quantity: 10.0,
+		}, nil)
+	boxRepository.On("UpdateBoxItem", mock.AnythingOfType("*entities.BoxItem")).
+		Return(nil)
+	boxRepository.On("CreateBoxTransaction", mock.AnythingOfType("*entities.BoxTransaction")).
+		Return(nil)
+
+	err := boxService.RemoveItemFromBox(quantity, boxID, itemID)
+
+	time.Sleep(2 * time.Second)
+
+	assert.NoError(t, err)
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceRemoveItemFromBoxErrorInItemRepository(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	itemID := uuid.NewString()
+	quantity := 5.0
+
+	mockError := errors.New("repository error")
+	itemRepository.On("GetByID", itemID).
+		Return(nil, mockError)
+
+	err := boxService.RemoveItemFromBox(quantity, boxID, itemID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnGetBoxItem(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	itemID := uuid.NewString()
+	quantity := 5.0
+
+	mockError := errors.New("repository error")
+	itemRepository.On("GetByID", itemID).
+		Return(&entities.Item{
+			ID: itemID,
+		}, nil)
+	boxRepository.On("GetBoxItem", boxID, itemID).
+		Return(nil, mockError)
+
+	err := boxService.RemoveItemFromBox(quantity, boxID, itemID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnDeleteBoxItem(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	itemID := uuid.NewString()
+	quantity := 10.0
+
+	mockError := errors.New("repository error")
+	itemRepository.On("GetByID", itemID).
+		Return(&entities.Item{
+			ID: itemID,
+		}, nil)
+	boxRepository.On("GetBoxItem", boxID, itemID).
+		Return(&entities.BoxItem{
+			BoxID:    boxID,
+			ItemID:   itemID,
+			Quantity: 10.0,
+		}, nil)
+	boxRepository.On("DeleteBoxItem", boxID, itemID).
+		Return(mockError)
+
+	err := boxService.RemoveItemFromBox(quantity, boxID, itemID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnUpdateBoxItem(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	itemID := uuid.NewString()
+	quantity := 5.0
+
+	mockError := errors.New("repository error")
+	itemRepository.On("GetByID", itemID).
+		Return(&entities.Item{
+			ID: itemID,
+		}, nil)
+	boxRepository.On("GetBoxItem", boxID, itemID).
+		Return(&entities.BoxItem{
+			BoxID:    boxID,
+			ItemID:   itemID,
+			Quantity: 10.0,
+		}, nil)
+	boxRepository.On("UpdateBoxItem", mock.AnythingOfType("*entities.BoxItem")).
+		Return(mockError)
+
+	err := boxService.RemoveItemFromBox(quantity, boxID, itemID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
