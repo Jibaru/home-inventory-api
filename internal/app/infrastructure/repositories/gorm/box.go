@@ -55,3 +55,11 @@ func (r *BoxRepository) CreateBoxTransaction(boxTransaction *entities.BoxTransac
 
 	return nil
 }
+
+func (r *BoxRepository) DeleteBoxItem(boxID string, itemID string) error {
+	if err := r.db.Where("box_id = ? AND item_id = ?", boxID, itemID).Delete(&entities.BoxItem{}).Error; err != nil {
+		return repositories.ErrBoxRepositoryCanNotDeleteBoxItem
+	}
+
+	return nil
+}
