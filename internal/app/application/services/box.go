@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	ErrRoomDoesNotExists = errors.New("room does not exists")
+	ErrRoomDoesNotExists                                      = errors.New("room does not exists")
+	ErrBoxServiceQuantityShouldBeLessOrEqualToBoxItemQuantity = errors.New("quantity should be less than or equal to box item quantity")
 )
 
 type BoxService struct {
@@ -114,6 +115,80 @@ func (s *BoxService) createAddBoxTransaction(
 	happenedAt time.Time,
 ) (*entities.BoxTransaction, error) {
 	boxTransaction, err := entities.NewAddBoxTransaction(
+		quantity,
+		boxID,
+		item,
+		happenedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.boxRepository.CreateBoxTransaction(boxTransaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return boxTransaction, nil
+}
+
+func (s *BoxService) RemoveItemFromBox(
+	quantity float64,
+	boxID string,
+	itemID string,
+) error {
+	item, err := s.itemRepository.GetByID(itemID)
+	if item == nil {
+		return err
+	}
+
+	boxItem, err := s.boxRepository.GetBoxItem(boxID, item.ID)
+	if err != nil {
+		return err
+	}
+
+	if quantity > boxItem.Quantity {
+		return ErrBoxServiceQuantityShouldBeLessOrEqualToBoxItemQuantity
+	}
+
+	if quantity == boxItem.Quantity {
+		err = s.boxRepository.DeleteBoxItem(boxID, item.ID)
+		if err != nil {
+			return err
+		}
+	} else {
+		boxItem.Quantity -= quantity
+
+		err = s.boxRepository.UpdateBoxItem(boxItem)
+		if err != nil {
+			return err
+		}
+	}
+
+	happenedAt := time.Now()
+
+	go func() {
+		_, err := s.createRemoveBoxTransaction(
+			quantity,
+			boxID,
+			*item,
+			happenedAt,
+		)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
+
+	return nil
+}
+
+func (s *BoxService) createRemoveBoxTransaction(
+	quantity float64,
+	boxID string,
+	item entities.Item,
+	happenedAt time.Time,
+) (*entities.BoxTransaction, error) {
+	boxTransaction, err := entities.NewRemoveBoxTransaction(
 		quantity,
 		boxID,
 		item,
