@@ -36,3 +36,31 @@ func (r *RoomRepository) ExistsByID(id string) (bool, error) {
 
 	return count > 0, nil
 }
+
+func (r *RoomRepository) GetByQueryFilters(queryFilter repositories.QueryFilter, pageFilter *repositories.PageFilter) ([]*entities.Room, error) {
+	var rooms []*entities.Room
+	err := applyFilters(r.db, queryFilter).
+		Offset(pageFilter.Offset).
+		Limit(pageFilter.Limit).
+		Find(&rooms).
+		Error
+
+	if err != nil {
+		return nil, repositories.ErrRoomRepositoryCanNotGetRooms
+	}
+
+	return rooms, nil
+}
+
+func (r *RoomRepository) CountByQueryFilters(queryFilter repositories.QueryFilter) (int64, error) {
+	var count int64
+	err := applyFilters(r.db.Model(&entities.Room{}), queryFilter).
+		Count(&count).
+		Error
+
+	if err != nil {
+		return 0, repositories.ErrRoomRepositoryCanNotCountRooms
+	}
+
+	return count, nil
+}
