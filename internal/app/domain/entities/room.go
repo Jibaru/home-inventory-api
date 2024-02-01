@@ -15,6 +15,12 @@ var (
 	ErrUserIDShouldNotBeEmpty              = errors.New("user id should not be empty")
 )
 
+const (
+	RoomNameField        = "name"
+	RoomDescriptionField = "description"
+	RoomUserIDField      = "user_id"
+)
+
 type Room struct {
 	ID          string
 	Name        string
