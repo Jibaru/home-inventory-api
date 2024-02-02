@@ -1,5 +1,7 @@
 FROM golang:1.21.3
 
+ARG APP_PORT
+
 RUN apt-get update && \
     apt-get install -y make
 
@@ -8,4 +10,4 @@ RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/i
 
 WORKDIR /app
 
-CMD ["bash"]
+EXPOSE ${APP_PORT}

@@ -6,8 +6,10 @@ services:
       context: .
     volumes:
       - .:/app
+    environment:
+      APP_PORT: ${APP_PORT}
     ports:
-      - "${APP_PORT}:80"
+      - "${APP_PORT}:${APP_PORT}"
     tty: true
     networks:
       - main
@@ -16,9 +18,11 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_PORT: ${DB_PORT}
+      MYSQL_TCP_PORT: ${DB_PORT}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./db_data:/var/lib/mysql
     ports:
       - "${DB_PORT}:${DB_PORT}"
     networks:
