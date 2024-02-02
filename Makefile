@@ -14,3 +14,15 @@ migrate:
 
 test:
 	go test ./...
+
+dev-start:
+	docker-compose --env-file app.env up
+
+dev-down:
+	docker-compose down
+
+dev-run:
+	docker exec -it home-inventory-api-workspace-1 /bin/bash -c "make run"
+
+dev-bash:
+	docker exec -it home-inventory-api-workspace-1 /bin/bash
