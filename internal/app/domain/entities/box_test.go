@@ -35,7 +35,7 @@ func TestNewBoxErrorNameShouldNotBeEmpty(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Nil(t, box)
-	assert.ErrorIs(t, err, ErrNameShouldNotBeEmpty)
+	assert.ErrorIs(t, err, ErrBoxNameShouldNotBeEmpty)
 }
 
 func TestNewBoxErrorNameShouldHave100OrLessChars(t *testing.T) {
@@ -47,7 +47,7 @@ func TestNewBoxErrorNameShouldHave100OrLessChars(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Nil(t, box)
-	assert.ErrorIs(t, err, ErrNameShouldHave100OrLessChars)
+	assert.ErrorIs(t, err, ErrBoxNameShouldHave100OrLessChars)
 }
 
 func TestNewBoxErrorDescriptionShouldNotBeEmpty(t *testing.T) {
@@ -59,7 +59,7 @@ func TestNewBoxErrorDescriptionShouldNotBeEmpty(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Nil(t, box)
-	assert.ErrorIs(t, err, ErrDescriptionShouldNotBeEmpty)
+	assert.ErrorIs(t, err, ErrBoxDescriptionShouldNotBeEmpty)
 }
 
 func TestNewBoxErrorDescriptionShouldHave255OrLessChars(t *testing.T) {
@@ -71,7 +71,7 @@ func TestNewBoxErrorDescriptionShouldHave255OrLessChars(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Nil(t, box)
-	assert.ErrorIs(t, err, ErrDescriptionShouldHave255OrLessChars)
+	assert.ErrorIs(t, err, ErrBoxDescriptionShouldHave255OrLessChars)
 }
 
 func TestNewBoxErrorRoomIDShouldNotBeEmpty(t *testing.T) {
@@ -83,5 +83,5 @@ func TestNewBoxErrorRoomIDShouldNotBeEmpty(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Nil(t, box)
-	assert.ErrorIs(t, err, ErrRoomIDShouldNotBeEmpty)
+	assert.ErrorIs(t, err, ErrBoxRoomIDShouldNotBeEmpty)
 }

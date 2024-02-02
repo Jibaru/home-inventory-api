@@ -18,7 +18,7 @@ func NewItemKeywordRepository(db *gorm.DB) *ItemKeywordRepository {
 
 func (r *ItemKeywordRepository) CreateMany(itemKeywords []*entities.ItemKeyword) error {
 	if err := r.db.Create(&itemKeywords).Error; err != nil {
-		return repositories.ErrCanNotCreateItemKeywords
+		return repositories.ErrItemKeywordRepositoryCanNotCreateItemKeywords
 	}
 
 	return nil

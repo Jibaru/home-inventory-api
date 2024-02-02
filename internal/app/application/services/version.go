@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	ErrVersionNotSet          = errors.New("current version is not set")
-	ErrCanNotGetLatestVersion = errors.New("can not get latest version")
+	ErrVersionServiceVersionNotSet          = errors.New("current version is not set")
+	ErrVersionServiceCanNotGetLatestVersion = errors.New("can not get latest version")
 )
 
 type VersionService struct {
@@ -24,10 +24,10 @@ func NewVersionService(versionRepository repositories.VersionRepository) *Versio
 func (s *VersionService) GetLatestVersion() (*entities.Version, error) {
 	version, err := s.versionRepository.GetLatest()
 
-	if err != nil && errors.Is(err, repositories.ErrVersionNotFound) {
-		return nil, ErrVersionNotSet
+	if err != nil && errors.Is(err, repositories.ErrVersionRepositoryVersionNotFound) {
+		return nil, ErrVersionServiceVersionNotSet
 	} else if err != nil {
-		return nil, ErrCanNotGetLatestVersion
+		return nil, ErrVersionServiceCanNotGetLatestVersion
 	}
 
 	return version, nil

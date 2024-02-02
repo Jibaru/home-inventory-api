@@ -18,7 +18,7 @@ func NewAssetRepository(db *gorm.DB) *AssetRepository {
 
 func (r *AssetRepository) Create(asset *entities.Asset) error {
 	if err := r.db.Create(asset).Error; err != nil {
-		return repositories.ErrCanNotCreateAsset
+		return repositories.ErrAssetRepositoryCanNotCreateAsset
 	}
 
 	return nil
@@ -40,7 +40,7 @@ func (r *AssetRepository) FindByEntity(
 	result := query.Find(&assets)
 
 	if result.Error != nil {
-		return nil, repositories.ErrCanNotGetAssets
+		return nil, repositories.ErrAssetRepositoryCanNotGetAssets
 	}
 
 	return assets, nil
@@ -48,7 +48,7 @@ func (r *AssetRepository) FindByEntity(
 
 func (r *AssetRepository) Delete(id string) error {
 	if err := r.db.Delete(&entities.Asset{}, "id = ?", id).Error; err != nil {
-		return repositories.ErrCanNotDeleteAsset
+		return repositories.ErrAssetRepositoryCanNotDeleteAsset
 	}
 
 	return nil

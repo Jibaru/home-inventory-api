@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	ErrNameShouldNotBeEmpty                = errors.New("name should not be empty")
-	ErrNameShouldHave100OrLessChars        = errors.New("name should have 100 or less characters")
-	ErrDescriptionShouldNotBeEmpty         = errors.New("description should not be empty")
-	ErrDescriptionShouldHave255OrLessChars = errors.New("description should have 255 or less characters")
-	ErrUserIDShouldNotBeEmpty              = errors.New("user id should not be empty")
+	ErrRoomDescriptionShouldHave255OrLessChars = errors.New("description should have 255 or less characters")
+	ErrRoomDescriptionShouldNotBeEmpty         = errors.New("description should not be empty")
+	ErrRoomNameShouldHave100OrLessChars        = errors.New("name should have 100 or less characters")
+	ErrRoomNameShouldNotBeEmpty                = errors.New("name should not be empty")
+	ErrRoomUserIDShouldNotBeEmpty              = errors.New("user id should not be empty")
 )
 
 const (
@@ -32,25 +32,25 @@ type Room struct {
 
 func NewRoom(name string, description *string, userID string) (*Room, error) {
 	if strings.TrimSpace(name) == "" {
-		return nil, ErrNameShouldNotBeEmpty
+		return nil, ErrRoomNameShouldNotBeEmpty
 	}
 
 	if len(name) > 100 {
-		return nil, ErrNameShouldHave100OrLessChars
+		return nil, ErrRoomNameShouldHave100OrLessChars
 	}
 
 	if description != nil {
 		if strings.TrimSpace(*description) == "" {
-			return nil, ErrDescriptionShouldNotBeEmpty
+			return nil, ErrRoomDescriptionShouldNotBeEmpty
 		}
 
 		if len(*description) > 255 {
-			return nil, ErrDescriptionShouldHave255OrLessChars
+			return nil, ErrRoomDescriptionShouldHave255OrLessChars
 		}
 	}
 
 	if strings.TrimSpace(userID) == "" {
-		return nil, ErrUserIDShouldNotBeEmpty
+		return nil, ErrRoomUserIDShouldNotBeEmpty
 	}
 
 	return &Room{

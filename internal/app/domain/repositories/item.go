@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	ErrCanNotCreateItem           = errors.New("can not create item")
-	ErrItemRepositoryItemNotFound = errors.New("item not found")
+	ErrItemRepositoryCanNotCreateItem = errors.New("can not create item")
+	ErrItemRepositoryItemNotFound     = errors.New("item not found")
 )
 
 type ItemRepository interface {

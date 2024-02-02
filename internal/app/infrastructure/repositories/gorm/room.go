@@ -18,7 +18,7 @@ func NewRoomRepository(db *gorm.DB) *RoomRepository {
 
 func (r *RoomRepository) Create(room *entities.Room) error {
 	if err := r.db.Create(room).Error; err != nil {
-		return repositories.ErrCanNotCreateRoom
+		return repositories.ErrRoomRepositoryCanNotCreateRoom
 	}
 
 	return nil
@@ -31,7 +31,7 @@ func (r *RoomRepository) ExistsByID(id string) (bool, error) {
 		Count(&count).
 		Error
 	if err != nil {
-		return false, repositories.ErrCanNotCheckIfRoomExistsByID
+		return false, repositories.ErrRoomRepositoryCanNotCheckIfRoomExistsByID
 	}
 
 	return count > 0, nil

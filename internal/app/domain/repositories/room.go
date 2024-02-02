@@ -6,10 +6,10 @@ import (
 )
 
 var (
-	ErrCanNotCreateRoom               = errors.New("can not create room")
-	ErrCanNotCheckIfRoomExistsByID    = errors.New("can not check if room exists by id")
-	ErrRoomRepositoryCanNotGetRooms   = errors.New("can not get rooms")
-	ErrRoomRepositoryCanNotCountRooms = errors.New("can not count rooms")
+	ErrRoomRepositoryCanNotCheckIfRoomExistsByID = errors.New("can not check if room exists by id")
+	ErrRoomRepositoryCanNotCountRooms            = errors.New("can not count rooms")
+	ErrRoomRepositoryCanNotCreateRoom            = errors.New("can not create room")
+	ErrRoomRepositoryCanNotGetRooms              = errors.New("can not get rooms")
 )
 
 type RoomRepository interface {

@@ -71,7 +71,7 @@ func (m *FileManager) getNewS3Client() (*s3.S3, error) {
 func (m *FileManager) Upload(file *os.File) (string, error) {
 	uploader, err := m.getUploader()
 	if err != nil {
-		return "", services.ErrCanNotUploadFile
+		return "", services.ErrFileManagerCanNotUploadFile
 	}
 
 	id := uuid.NewString()
@@ -84,7 +84,7 @@ func (m *FileManager) Upload(file *os.File) (string, error) {
 		Body:   file,
 	})
 	if err != nil {
-		return "", services.ErrUploadingFile
+		return "", services.ErrFileManagerUploadingFile
 	}
 
 	return id, nil
@@ -101,7 +101,7 @@ func (m *FileManager) GenerateUrl(id string, extension string) string {
 func (m *FileManager) Delete(id string, extension string) error {
 	client, err := m.getNewS3Client()
 	if err != nil {
-		return services.ErrCanNotDeleteFile
+		return services.ErrFileManagerCanNotDeleteFile
 	}
 
 	_, err = client.DeleteObject(&s3.DeleteObjectInput{
@@ -109,7 +109,7 @@ func (m *FileManager) Delete(id string, extension string) error {
 		Key:    aws.String(id + extension),
 	})
 	if err != nil {
-		return services.ErrCanNotDeleteFile
+		return services.ErrFileManagerCanNotDeleteFile
 	}
 
 	err = client.WaitUntilObjectNotExists(&s3.HeadObjectInput{
@@ -117,7 +117,7 @@ func (m *FileManager) Delete(id string, extension string) error {
 		Key:    aws.String(id + extension),
 	})
 	if err != nil {
-		return services.ErrCanNotDeleteFile
+		return services.ErrFileManagerCanNotDeleteFile
 	}
 
 	return nil

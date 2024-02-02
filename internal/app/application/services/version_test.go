@@ -28,12 +28,12 @@ func TestVersionServiceGetLatestVersionErrorNotFound(t *testing.T) {
 	mockRepo := new(stub.VersionRepositoryMock)
 	versionService := NewVersionService(mockRepo)
 
-	mockRepo.On("GetLatest").Return(nil, repositories.ErrVersionNotFound).Once()
+	mockRepo.On("GetLatest").Return(nil, repositories.ErrVersionRepositoryVersionNotFound).Once()
 
 	version, err := versionService.GetLatestVersion()
 
 	assert.Error(t, err)
-	assert.EqualError(t, err, ErrVersionNotSet.Error())
+	assert.EqualError(t, err, ErrVersionServiceVersionNotSet.Error())
 	mockRepo.AssertCalled(t, "GetLatest")
 	assert.Nil(t, version)
 }
@@ -47,7 +47,7 @@ func TestVersionServiceGetLatestVersionErrorCanNotGetLatestVersion(t *testing.T)
 	version, err := versionService.GetLatestVersion()
 
 	assert.Error(t, err)
-	assert.EqualError(t, err, ErrCanNotGetLatestVersion.Error())
+	assert.EqualError(t, err, ErrVersionServiceCanNotGetLatestVersion.Error())
 	mockRepo.AssertCalled(t, "GetLatest")
 	assert.Nil(t, version)
 }

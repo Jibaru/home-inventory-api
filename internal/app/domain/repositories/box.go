@@ -6,12 +6,12 @@ import (
 )
 
 var (
-	ErrCanNotCreateBox                         = errors.New("can not create box")
 	ErrBoxRepositoryBoxItemNotFound            = errors.New("box item not found")
 	ErrBoxRepositoryCanBotCreateBoxItem        = errors.New("can not create box item")
-	ErrBoxRepositoryCanNotUpdateBoxItem        = errors.New("can not update box item")
+	ErrBoxRepositoryCanNotCreateBox            = errors.New("can not create box")
 	ErrBoxRepositoryCanNotCreateBoxTransaction = errors.New("can not create box transaction")
 	ErrBoxRepositoryCanNotDeleteBoxItem        = errors.New("can not delete box item")
+	ErrBoxRepositoryCanNotUpdateBoxItem        = errors.New("can not update box item")
 )
 
 type BoxRepository interface {

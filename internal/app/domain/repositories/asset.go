@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	ErrCanNotCreateAsset = errors.New("can not create asset")
-	ErrCanNotGetAssets   = errors.New("can not get assets")
-	ErrCanNotDeleteAsset = errors.New("can not delete asset")
+	ErrAssetRepositoryCanNotCreateAsset = errors.New("can not create asset")
+	ErrAssetRepositoryCanNotDeleteAsset = errors.New("can not delete asset")
+	ErrAssetRepositoryCanNotGetAssets   = errors.New("can not get assets")
 )
 
 type AssetRepository interface {

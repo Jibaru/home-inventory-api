@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	ErrUserNotFound  = errors.New("user not found")
-	ErrCanNotGetUser = errors.New("can not get user")
+	ErrUserRepositoryCanNotGetUser = errors.New("can not get user")
+	ErrUserRepositoryUserNotFound  = errors.New("user not found")
 )
 
 type UserRepository interface {

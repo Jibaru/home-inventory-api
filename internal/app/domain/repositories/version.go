@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	ErrVersionNotFound = errors.New("version not found")
+	ErrVersionRepositoryVersionNotFound = errors.New("version not found")
 )
 
 type VersionRepository interface {
