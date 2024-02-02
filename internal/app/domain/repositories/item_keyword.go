@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	ErrCanNotCreateItemKeywords = errors.New("can not create item keywords")
+	ErrItemKeywordRepositoryCanNotCreateItemKeywords = errors.New("can not create item keywords")
 )
 
 type ItemKeywordRepository interface {

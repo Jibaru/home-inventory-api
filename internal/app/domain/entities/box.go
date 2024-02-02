@@ -8,7 +8,11 @@ import (
 )
 
 var (
-	ErrRoomIDShouldNotBeEmpty = errors.New("room id should not be empty")
+	ErrBoxDescriptionShouldHave255OrLessChars = errors.New("description should have 255 or less chars")
+	ErrBoxDescriptionShouldNotBeEmpty         = errors.New("description should not be empty")
+	ErrBoxNameShouldHave100OrLessChars        = errors.New("name should have 100 or less chars")
+	ErrBoxNameShouldNotBeEmpty                = errors.New("name should not be empty")
+	ErrBoxRoomIDShouldNotBeEmpty              = errors.New("room id should not be empty")
 )
 
 type Box struct {
@@ -26,25 +30,25 @@ func NewBox(
 	roomID string,
 ) (*Box, error) {
 	if strings.TrimSpace(name) == "" {
-		return nil, ErrNameShouldNotBeEmpty
+		return nil, ErrBoxNameShouldNotBeEmpty
 	}
 
 	if len(name) > 100 {
-		return nil, ErrNameShouldHave100OrLessChars
+		return nil, ErrBoxNameShouldHave100OrLessChars
 	}
 
 	if description != nil {
 		if strings.TrimSpace(*description) == "" {
-			return nil, ErrDescriptionShouldNotBeEmpty
+			return nil, ErrBoxDescriptionShouldNotBeEmpty
 		}
 
 		if len(*description) > 255 {
-			return nil, ErrDescriptionShouldHave255OrLessChars
+			return nil, ErrBoxDescriptionShouldHave255OrLessChars
 		}
 	}
 
 	if strings.TrimSpace(roomID) == "" {
-		return nil, ErrRoomIDShouldNotBeEmpty
+		return nil, ErrBoxRoomIDShouldNotBeEmpty
 	}
 
 	return &Box{

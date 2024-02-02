@@ -61,7 +61,7 @@ func TestBoxRepositoryCreateBoxErrorCanNotCreateBox(t *testing.T) {
 	err := boxRepository.Create(box)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, repositories.ErrCanNotCreateBox)
+	assert.ErrorIs(t, err, repositories.ErrBoxRepositoryCanNotCreateBox)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }

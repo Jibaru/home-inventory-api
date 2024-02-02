@@ -84,7 +84,7 @@ func TestAssetRepositoryCreateAssetErrorCanNotCreateAsset(t *testing.T) {
 	err := assetRepository.Create(asset)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, repositories.ErrCanNotCreateAsset)
+	assert.ErrorIs(t, err, repositories.ErrAssetRepositoryCanNotCreateAsset)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
@@ -237,7 +237,7 @@ func TestAssetRepositoryFindByEntityErrorCanNotGetAssets(t *testing.T) {
 
 	assert.Nil(t, assets)
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, repositories.ErrCanNotGetAssets)
+	assert.ErrorIs(t, err, repositories.ErrAssetRepositoryCanNotGetAssets)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }

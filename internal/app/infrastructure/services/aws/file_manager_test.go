@@ -104,5 +104,5 @@ func TestFileManagerDeleteErrorCanNotDeleteFile(t *testing.T) {
 	err := manager.Delete(invalidObjectID, invalidExtension)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, services.ErrCanNotDeleteFile)
+	assert.ErrorIs(t, err, services.ErrFileManagerCanNotDeleteFile)
 }

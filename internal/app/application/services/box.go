@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ErrRoomDoesNotExists                                      = errors.New("room does not exists")
+	ErrBoxServiceRoomDoesNotExists                            = errors.New("room does not exists")
 	ErrBoxServiceQuantityShouldBeLessOrEqualToBoxItemQuantity = errors.New("quantity should be less than or equal to box item quantity")
 )
 
@@ -38,7 +38,7 @@ func (s *BoxService) Create(name string, description *string, roomID string) (*e
 	}
 
 	if !exists {
-		return nil, ErrRoomDoesNotExists
+		return nil, ErrBoxServiceRoomDoesNotExists
 	}
 
 	box, err := entities.NewBox(name, description, roomID)

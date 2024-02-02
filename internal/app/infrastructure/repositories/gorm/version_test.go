@@ -49,7 +49,7 @@ func TestVersionRepositoryGetLatestVersionErrorVersionNotFound(t *testing.T) {
 
 	assert.Nil(t, version)
 	assert.Error(t, err)
-	assert.ErrorIs(t, repositories.ErrVersionNotFound, err)
+	assert.ErrorIs(t, repositories.ErrVersionRepositoryVersionNotFound, err)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }

@@ -99,7 +99,7 @@ func TestItemKeywordRepositoryCreateManyErrorCanNotCreateItemKeywords(t *testing
 	err := itemKeywordRepository.CreateMany(itemKeywords)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, repositories.ErrCanNotCreateItemKeywords)
+	assert.ErrorIs(t, err, repositories.ErrItemKeywordRepositoryCanNotCreateItemKeywords)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }

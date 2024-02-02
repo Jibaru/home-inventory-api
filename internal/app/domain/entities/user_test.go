@@ -33,7 +33,7 @@ func TestNewUserErrorInvalidEmail(t *testing.T) {
 	_, err := NewUser(invalidEmail, password)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, ErrInvalidEmailAddress)
+	assert.ErrorIs(t, err, ErrUserInvalidEmailAddress)
 }
 
 func TestNewUserErrorEmailExceedsMaxLength(t *testing.T) {
@@ -43,7 +43,7 @@ func TestNewUserErrorEmailExceedsMaxLength(t *testing.T) {
 	_, err := NewUser(invalidEmail, password)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, ErrEmailExceedsMaxLengthOf100Chars)
+	assert.ErrorIs(t, err, ErrUserEmailExceedsMaxLengthOf100Chars)
 }
 
 func TestNewUserErrorPasswordMustBeBetween6And100Chars(t *testing.T) {
@@ -54,9 +54,9 @@ func TestNewUserErrorPasswordMustBeBetween6And100Chars(t *testing.T) {
 	_, err2 := NewUser("test@example.com", giantPassword)
 
 	assert.Error(t, err1)
-	assert.ErrorIs(t, err1, ErrPasswordMustBeBetween6And100Chars)
+	assert.ErrorIs(t, err1, ErrUserPasswordMustBeBetween6And100Chars)
 	assert.Error(t, err2)
-	assert.ErrorIs(t, err1, ErrPasswordMustBeBetween6And100Chars)
+	assert.ErrorIs(t, err1, ErrUserPasswordMustBeBetween6And100Chars)
 }
 
 func TestNewUserErrorPasswordMustContainAtLeastOneNumber(t *testing.T) {
@@ -65,7 +65,7 @@ func TestNewUserErrorPasswordMustContainAtLeastOneNumber(t *testing.T) {
 	_, err := NewUser("test@example.com", invalidPassword)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, ErrPasswordMustContainAtLeastOneLetterAndOneNumber)
+	assert.ErrorIs(t, err, ErrUserPasswordMustContainAtLeastOneLetterAndOneNumber)
 }
 
 func TestNewUserErrorPasswordMustContainAtLeastOneLetter(t *testing.T) {
@@ -74,5 +74,5 @@ func TestNewUserErrorPasswordMustContainAtLeastOneLetter(t *testing.T) {
 	_, err := NewUser("test@example.com", invalidPassword)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, ErrPasswordMustContainAtLeastOneLetterAndOneNumber)
+	assert.ErrorIs(t, err, ErrUserPasswordMustContainAtLeastOneLetterAndOneNumber)
 }

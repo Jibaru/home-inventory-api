@@ -114,7 +114,7 @@ func TestUserRepositoryFindByEmailErrorUserNotFound(t *testing.T) {
 
 	assert.Nil(t, user)
 	assert.Error(t, err)
-	assert.ErrorIs(t, repositories.ErrUserNotFound, err)
+	assert.ErrorIs(t, repositories.ErrUserRepositoryUserNotFound, err)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }

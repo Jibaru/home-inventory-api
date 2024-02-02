@@ -22,7 +22,7 @@ func (r *VersionRepository) GetLatest() (*entities.Version, error) {
 	err := r.db.First(version).Error
 
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, repositories.ErrVersionNotFound
+		return nil, repositories.ErrVersionRepositoryVersionNotFound
 	}
 
 	return version, nil

@@ -16,7 +16,7 @@ func NewBoxRepository(db *gorm.DB) *BoxRepository {
 
 func (r *BoxRepository) Create(box *entities.Box) error {
 	if err := r.db.Create(box).Error; err != nil {
-		return repositories.ErrCanNotCreateBox
+		return repositories.ErrBoxRepositoryCanNotCreateBox
 	}
 
 	return nil

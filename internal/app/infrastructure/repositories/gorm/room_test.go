@@ -61,7 +61,7 @@ func TestRoomRepositoryCreateRoomErrorCanNotCreateRoom(t *testing.T) {
 	err := roomRepository.Create(room)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, repositories.ErrCanNotCreateRoom)
+	assert.ErrorIs(t, err, repositories.ErrRoomRepositoryCanNotCreateRoom)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
@@ -97,7 +97,7 @@ func TestRoomRepositoryExistsByIDErrorCanNotCheckIfRoomExistsByID(t *testing.T) 
 	exists, err := roomRepository.ExistsByID(roomID)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, repositories.ErrCanNotCheckIfRoomExistsByID)
+	assert.ErrorIs(t, err, repositories.ErrRoomRepositoryCanNotCheckIfRoomExistsByID)
 	assert.False(t, exists)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)

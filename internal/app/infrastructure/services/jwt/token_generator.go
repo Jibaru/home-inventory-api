@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/services"
 	"time"
@@ -40,7 +39,7 @@ func (s *TokenGenerator) GenerateToken(id string, email string) (string, error) 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	encodedToken, err := token.SignedString([]byte(s.Secret))
 	if err != nil {
-		return "", services.ErrCanNotGenerateToken
+		return "", services.ErrTokenGeneratorCanNotGenerateToken
 	}
 
 	return encodedToken, nil
@@ -49,21 +48,21 @@ func (s *TokenGenerator) GenerateToken(id string, email string) (string, error) 
 func (s *TokenGenerator) DecodeToken(tokenString string) (*CustomClaims, error) {
 	verifier, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("can not verify token")
+			return nil, services.ErrTokenGeneratorCanNotVerifyToken
 		}
 		return []byte(s.Secret), nil
 	})
 	if err != nil {
-		return nil, errors.New("can not verify token")
+		return nil, services.ErrTokenGeneratorCanNotVerifyToken
 	}
 
 	if !verifier.Valid {
-		return nil, errors.New("token is not valid")
+		return nil, services.ErrTokenGeneratorTokenIsNotValid
 	}
 
 	claims, ok := verifier.Claims.(jwt.MapClaims)
 	if !ok {
-		return nil, errors.New("unable to parse claims")
+		return nil, services.ErrTokenGeneratorUnableToParseClaims
 	}
 
 	return &CustomClaims{

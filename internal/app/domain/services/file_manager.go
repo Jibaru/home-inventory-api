@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	ErrCanNotUploadFile = errors.New("can not upload file")
-	ErrUploadingFile    = errors.New("error uploading file")
-	ErrCanNotDeleteFile = errors.New("can not delete file")
+	ErrFileManagerCanNotDeleteFile = errors.New("can not delete file")
+	ErrFileManagerCanNotUploadFile = errors.New("can not upload file")
+	ErrFileManagerUploadingFile    = errors.New("error uploading file")
 )
 
 type FileManager interface {

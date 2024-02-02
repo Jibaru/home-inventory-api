@@ -26,11 +26,11 @@ func (r *UserRepository) FindByEmail(email string) (*entities.User, error) {
 
 	err := r.db.First(user, "email = ?", email).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, repositories.ErrUserNotFound
+		return nil, repositories.ErrUserRepositoryUserNotFound
 	}
 
 	if err != nil {
-		return nil, repositories.ErrCanNotGetUser
+		return nil, repositories.ErrUserRepositoryCanNotGetUser
 	}
 
 	return user, nil

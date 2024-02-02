@@ -18,7 +18,7 @@ func NewItemRepository(db *gorm.DB) *ItemRepository {
 
 func (r *ItemRepository) Create(item *entities.Item) error {
 	if err := r.db.Create(item).Error; err != nil {
-		return repositories.ErrCanNotCreateItem
+		return repositories.ErrItemRepositoryCanNotCreateItem
 	}
 
 	return nil
