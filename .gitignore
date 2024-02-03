@@ -1,3 +1,4 @@
 app.env
 
 db_data/
+logs/*.log
