@@ -3,6 +3,7 @@ package gorm
 import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
+	"github.com/jibaru/home-inventory-api/m/logger"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +19,7 @@ func NewRoomRepository(db *gorm.DB) *RoomRepository {
 
 func (r *RoomRepository) Create(room *entities.Room) error {
 	if err := r.db.Create(room).Error; err != nil {
+		logger.LogError(err)
 		return repositories.ErrRoomRepositoryCanNotCreateRoom
 	}
 
@@ -31,6 +33,7 @@ func (r *RoomRepository) ExistsByID(id string) (bool, error) {
 		Count(&count).
 		Error
 	if err != nil {
+		logger.LogError(err)
 		return false, repositories.ErrRoomRepositoryCanNotCheckIfRoomExistsByID
 	}
 
@@ -46,6 +49,7 @@ func (r *RoomRepository) GetByQueryFilters(queryFilter repositories.QueryFilter,
 		Error
 
 	if err != nil {
+		logger.LogError(err)
 		return nil, repositories.ErrRoomRepositoryCanNotGetRooms
 	}
 
@@ -59,6 +63,7 @@ func (r *RoomRepository) CountByQueryFilters(queryFilter repositories.QueryFilte
 		Error
 
 	if err != nil {
+		logger.LogError(err)
 		return 0, repositories.ErrRoomRepositoryCanNotCountRooms
 	}
 

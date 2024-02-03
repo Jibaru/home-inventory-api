@@ -3,6 +3,7 @@ package gorm
 import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
+	"github.com/jibaru/home-inventory-api/m/logger"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +19,7 @@ func NewAssetRepository(db *gorm.DB) *AssetRepository {
 
 func (r *AssetRepository) Create(asset *entities.Asset) error {
 	if err := r.db.Create(asset).Error; err != nil {
+		logger.LogError(err)
 		return repositories.ErrAssetRepositoryCanNotCreateAsset
 	}
 
@@ -39,7 +41,8 @@ func (r *AssetRepository) FindByEntity(
 
 	result := query.Find(&assets)
 
-	if result.Error != nil {
+	if err := result.Error; err != nil {
+		logger.LogError(err)
 		return nil, repositories.ErrAssetRepositoryCanNotGetAssets
 	}
 
@@ -48,6 +51,7 @@ func (r *AssetRepository) FindByEntity(
 
 func (r *AssetRepository) Delete(id string) error {
 	if err := r.db.Delete(&entities.Asset{}, "id = ?", id).Error; err != nil {
+		logger.LogError(err)
 		return repositories.ErrAssetRepositoryCanNotDeleteAsset
 	}
 

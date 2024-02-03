@@ -3,6 +3,7 @@ package gorm
 import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
+	"github.com/jibaru/home-inventory-api/m/logger"
 	"gorm.io/gorm"
 )
 
@@ -26,6 +27,7 @@ func (r *BoxRepository) GetBoxItem(boxID string, itemID string) (*entities.BoxIt
 	var boxItem entities.BoxItem
 
 	if err := r.db.Where("box_id = ? AND item_id = ?", boxID, itemID).First(&boxItem).Error; err != nil {
+		logger.LogError(err)
 		return nil, repositories.ErrBoxRepositoryBoxItemNotFound
 	}
 
@@ -34,6 +36,7 @@ func (r *BoxRepository) GetBoxItem(boxID string, itemID string) (*entities.BoxIt
 
 func (r *BoxRepository) CreateBoxItem(boxItem *entities.BoxItem) error {
 	if err := r.db.Create(boxItem).Error; err != nil {
+		logger.LogError(err)
 		return repositories.ErrBoxRepositoryCanBotCreateBoxItem
 	}
 
@@ -42,6 +45,7 @@ func (r *BoxRepository) CreateBoxItem(boxItem *entities.BoxItem) error {
 
 func (r *BoxRepository) UpdateBoxItem(boxItem *entities.BoxItem) error {
 	if err := r.db.Save(boxItem).Error; err != nil {
+		logger.LogError(err)
 		return repositories.ErrBoxRepositoryCanNotUpdateBoxItem
 	}
 
@@ -50,6 +54,7 @@ func (r *BoxRepository) UpdateBoxItem(boxItem *entities.BoxItem) error {
 
 func (r *BoxRepository) CreateBoxTransaction(boxTransaction *entities.BoxTransaction) error {
 	if err := r.db.Create(boxTransaction).Error; err != nil {
+		logger.LogError(err)
 		return repositories.ErrBoxRepositoryCanNotCreateBoxTransaction
 	}
 
@@ -58,6 +63,7 @@ func (r *BoxRepository) CreateBoxTransaction(boxTransaction *entities.BoxTransac
 
 func (r *BoxRepository) DeleteBoxItem(boxID string, itemID string) error {
 	if err := r.db.Where("box_id = ? AND item_id = ?", boxID, itemID).Delete(&entities.BoxItem{}).Error; err != nil {
+		logger.LogError(err)
 		return repositories.ErrBoxRepositoryCanNotDeleteBoxItem
 	}
 
