@@ -7,8 +7,8 @@ import (
 	repositories "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/gorm"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/aws"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/jwt"
+	"github.com/jibaru/home-inventory-api/m/logger"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 	"time"
 )
@@ -54,10 +54,11 @@ func RunServer(
 	removeItemFromBoxController := controllers.NewRemoveItemFromBoxController(boxService)
 	getRoomsController := controllers.NewGetRoomsController(roomService)
 
+	loggerMiddleware := middlewares.NewLoggerMiddleware()
 	needsAuthMiddleware := middlewares.NewNeedsAuthMiddleware(authService)
 
 	e := echo.New()
-	e.Use(middleware.Logger())
+	e.Use(loggerMiddleware.Process)
 
 	api := e.Group("/api/v1")
 	api.POST("/login", logInController.Handle)
@@ -73,5 +74,5 @@ func RunServer(
 	authApi.DELETE("/boxes/:boxID/items/:itemID", removeItemFromBoxController.Handle)
 	authApi.GET("/rooms", getRoomsController.Handle)
 
-	e.Logger.Fatal(e.Start(host + ":" + port))
+	logger.LogError(e.Start(host + ":" + port))
 }

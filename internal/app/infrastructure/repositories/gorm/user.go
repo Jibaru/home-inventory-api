@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
+	"github.com/jibaru/home-inventory-api/m/logger"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +19,12 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 }
 
 func (r *UserRepository) Create(user *entities.User) error {
-	return r.db.Create(user).Error
+	if err := r.db.Create(user).Error; err != nil {
+		logger.LogError(err)
+		return repositories.ErrUserRepositoryCanNotCreateUser
+	}
+
+	return nil
 }
 
 func (r *UserRepository) FindByEmail(email string) (*entities.User, error) {
@@ -26,6 +32,7 @@ func (r *UserRepository) FindByEmail(email string) (*entities.User, error) {
 
 	err := r.db.First(user, "email = ?", email).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		logger.LogError(err)
 		return nil, repositories.ErrUserRepositoryUserNotFound
 	}
 

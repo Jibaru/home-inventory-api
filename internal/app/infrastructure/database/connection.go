@@ -28,7 +28,9 @@ func (c DBConfig) DSN() string {
 func CreateConnection(
 	config DBConfig,
 ) (*gorm.DB, error) {
-	db, err := gorm.Open(mysql.Open(config.DSN()), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(config.DSN()), &gorm.Config{
+		Logger: NewGormLogger(),
+	})
 	if err != nil {
 		return nil, err
 	}

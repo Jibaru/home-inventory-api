@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/database"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/http"
-	"log"
+	"github.com/jibaru/home-inventory-api/m/logger"
 	"strconv"
 	"time"
 )
@@ -11,7 +11,7 @@ import (
 func main() {
 	config, err := ReadConfig()
 	if err != nil {
-		log.Fatal(err)
+		logger.LogError(err)
 		return
 	}
 
@@ -25,7 +25,7 @@ func main() {
 		},
 	)
 	if err != nil {
-		log.Fatal(err)
+		logger.LogError(err)
 		return
 	}
 
