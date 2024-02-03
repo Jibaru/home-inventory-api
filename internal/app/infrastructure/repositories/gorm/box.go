@@ -69,3 +69,35 @@ func (r *BoxRepository) DeleteBoxItem(boxID string, itemID string) error {
 
 	return nil
 }
+
+func (r *BoxRepository) GetByQueryFilters(queryFilter repositories.QueryFilter, pageFilter *repositories.PageFilter) ([]*entities.Box, error) {
+	var boxes []*entities.Box
+	err := applyFilters(r.db, queryFilter).
+		Joins("inner join rooms on boxes.room_id = rooms.id").
+		Offset(pageFilter.Offset).
+		Limit(pageFilter.Limit).
+		Find(&boxes).
+		Error
+
+	if err != nil {
+		logger.LogError(err)
+		return nil, repositories.ErrorBoxRepositoryCanNotGetByQueryFilters
+	}
+
+	return boxes, nil
+}
+
+func (r *BoxRepository) CountByQueryFilters(queryFilter repositories.QueryFilter) (int64, error) {
+	var count int64
+	err := applyFilters(r.db.Model(&entities.Box{}), queryFilter).
+		Joins("inner join rooms on boxes.room_id = rooms.id").
+		Count(&count).
+		Error
+
+	if err != nil {
+		logger.LogError(err)
+		return 0, repositories.ErrorBoxRepositoryCanNotCountByQueryFilters
+	}
+
+	return count, nil
+}
