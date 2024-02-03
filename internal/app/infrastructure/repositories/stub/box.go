@@ -2,6 +2,7 @@ package stub
 
 import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
+	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -42,4 +43,22 @@ func (m *BoxRepositoryMock) CreateBoxTransaction(boxTransaction *entities.BoxTra
 func (m *BoxRepositoryMock) DeleteBoxItem(boxID string, itemID string) error {
 	args := m.Called(boxID, itemID)
 	return args.Error(0)
+}
+
+func (m *BoxRepositoryMock) GetByQueryFilters(
+	queryFilter repositories.QueryFilter,
+	pageFilter *repositories.PageFilter,
+) ([]*entities.Box, error) {
+	args := m.Called(queryFilter, pageFilter)
+
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
+	return args.Get(0).([]*entities.Box), args.Error(1)
+}
+
+func (m *BoxRepositoryMock) CountByQueryFilters(queryFilter repositories.QueryFilter) (int64, error) {
+	args := m.Called(queryFilter)
+	return args.Get(0).(int64), args.Error(1)
 }
