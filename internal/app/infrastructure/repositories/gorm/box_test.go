@@ -343,3 +343,185 @@ func TestBoxRepositoryDeleteBoxItemErrorBoxRepositoryCanNotDeleteBoxItem(t *test
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestBoxRepositoryGetByQueryFilters(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	userID := uuid.NewString()
+	roomID := uuid.NewString()
+
+	queryFilter := repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "rooms.user_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    userID,
+					},
+					{
+						Field:    "room_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    roomID,
+					},
+				},
+			},
+		},
+	}
+	pageFilter := &repositories.PageFilter{
+		Offset: 0,
+		Limit:  10,
+	}
+
+	boxes := make([]*entities.Box, 0)
+	for i := 0; i < 10; i++ {
+		description := random.String(255, random.Alphanumeric)
+		boxes = append(boxes, &entities.Box{
+			ID:          uuid.NewString(),
+			Name:        random.String(100, random.Alphanumeric),
+			Description: &description,
+			RoomID:      uuid.NewString(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		})
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "name", "description", "room_id", "created_at", "updated_at"})
+	for _, box := range boxes {
+		rows.AddRow(box.ID, box.Name, *box.Description, box.RoomID, box.CreatedAt, box.UpdatedAt)
+	}
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT `boxes`.`id`,`boxes`.`name`,`boxes`.`description`,`boxes`.`room_id`,`boxes`.`created_at`,`boxes`.`updated_at` FROM `boxes` inner join rooms on boxes.room_id = rooms.id WHERE rooms.user_id = ? AND room_id = ? LIMIT 10")).
+		WithArgs(userID, roomID).
+		WillReturnRows(rows)
+
+	result, err := boxRepository.GetByQueryFilters(queryFilter, pageFilter)
+
+	assert.NoError(t, err)
+	assert.Equal(t, boxes, result)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryGetByQueryFiltersErrorBoxRepositoryCanNotGetByQueryFilters(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	userID := uuid.NewString()
+	roomID := uuid.NewString()
+
+	queryFilter := repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "rooms.user_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    userID,
+					},
+					{
+						Field:    "room_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    roomID,
+					},
+				},
+			},
+		},
+	}
+	pageFilter := &repositories.PageFilter{
+		Offset: 0,
+		Limit:  10,
+	}
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT `boxes`.`id`,`boxes`.`name`,`boxes`.`description`,`boxes`.`room_id`,`boxes`.`created_at`,`boxes`.`updated_at` FROM `boxes` inner join rooms on boxes.room_id = rooms.id WHERE rooms.user_id = ? AND room_id = ? LIMIT 10")).
+		WithArgs(userID, roomID).
+		WillReturnError(errors.New("database error"))
+
+	result, err := boxRepository.GetByQueryFilters(queryFilter, pageFilter)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrorBoxRepositoryCanNotGetByQueryFilters)
+	assert.Nil(t, result)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryCountByQueryFilters(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	userID := uuid.NewString()
+	roomID := uuid.NewString()
+
+	queryFilter := repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "rooms.user_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    userID,
+					},
+					{
+						Field:    "room_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    roomID,
+					},
+				},
+			},
+		},
+	}
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `boxes` inner join rooms on boxes.room_id = rooms.id WHERE rooms.user_id = ? AND room_id = ?")).
+		WithArgs(userID, roomID).
+		WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(10))
+
+	result, err := boxRepository.CountByQueryFilters(queryFilter)
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(10), result)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryCountByQueryFiltersErrorBoxRepositoryCanNotCountByQueryFilters(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	userID := uuid.NewString()
+	roomID := uuid.NewString()
+
+	queryFilter := repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "rooms.user_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    userID,
+					},
+					{
+						Field:    "room_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    roomID,
+					},
+				},
+			},
+		},
+	}
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `boxes` inner join rooms on boxes.room_id = rooms.id WHERE rooms.user_id = ? AND room_id = ?")).
+		WithArgs(userID, roomID).
+		WillReturnError(errors.New("database error"))
+
+	result, err := boxRepository.CountByQueryFilters(queryFilter)
+
+	assert.Error(t, err)
+	assert.Empty(t, result)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
