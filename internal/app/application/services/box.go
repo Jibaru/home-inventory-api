@@ -205,3 +205,99 @@ func (s *BoxService) createRemoveBoxTransaction(
 
 	return boxTransaction, nil
 }
+
+func (s *BoxService) GetAll(
+	roomID string,
+	userID string,
+	search string,
+	pageFilter PageFilter,
+) ([]*entities.Box, error) {
+	queryFilter := s.makeGetAllQueryFilter(search, roomID, userID)
+
+	boxes, err := s.boxRepository.GetByQueryFilters(*queryFilter, &repositories.PageFilter{
+		Offset: (pageFilter.Page - 1) * pageFilter.Size,
+		Limit:  pageFilter.Size,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return boxes, nil
+}
+
+func (s *BoxService) CountAll(
+	userID string,
+	search string,
+	roomID string,
+) (int64, error) {
+	queryFilter := s.makeGetAllQueryFilter(search, roomID, userID)
+
+	count, err := s.boxRepository.CountByQueryFilters(*queryFilter)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (s *BoxService) makeGetAllQueryFilter(
+	search string,
+	roomID string,
+	userID string,
+) *repositories.QueryFilter {
+	queryFilter := &repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "rooms.user_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    userID,
+					},
+				},
+			},
+		},
+	}
+
+	if roomID != "" {
+		roomIDConditionGroup := repositories.ConditionGroup{
+			Operator: repositories.OrLogicalOperator,
+			Conditions: []repositories.Condition{
+				{
+					Field:    "boxes.room_id",
+					Operator: repositories.EqualComparisonOperator,
+					Value:    roomID,
+				},
+			},
+		}
+		queryFilter.ConditionGroups = append(
+			queryFilter.ConditionGroups,
+			roomIDConditionGroup,
+		)
+	}
+
+	if search != "" {
+		searchConditionGroup := repositories.ConditionGroup{
+			Operator: repositories.OrLogicalOperator,
+			Conditions: []repositories.Condition{
+				{
+					Field:    "boxes.name",
+					Operator: repositories.LikeComparisonOperator,
+					Value:    "%" + search + "%",
+				},
+				{
+					Field:    "boxes.description",
+					Operator: repositories.LikeComparisonOperator,
+					Value:    "%" + search + "%",
+				},
+			},
+		}
+		queryFilter.ConditionGroups = append(
+			queryFilter.ConditionGroups,
+			searchConditionGroup,
+		)
+	}
+
+	return queryFilter
+}
