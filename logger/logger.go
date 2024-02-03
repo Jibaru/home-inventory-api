@@ -1,3 +1,6 @@
+//go:build !testing
+// +build !testing
+
 package logger
 
 import (
@@ -18,16 +21,17 @@ func init() {
 }
 
 func NewAppLogger() *AppLogger {
+	var writer io.Writer = os.Stdout
 	file, err := os.OpenFile("logs/app.log", os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
-	if err != nil {
-		panic(err)
+	if err == nil {
+		writer = io.MultiWriter(file, os.Stdout)
 	}
 
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{
 		TimestampFormat: "2006-01-02T15:04:05.999999999Z07:00",
 	})
-	logger.SetOutput(io.MultiWriter(file, os.Stdout))
+	logger.SetOutput(writer)
 	logger.SetLevel(logrus.TraceLevel)
 
 	return &AppLogger{logger}
