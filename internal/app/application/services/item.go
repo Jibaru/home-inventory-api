@@ -78,3 +78,115 @@ func (s *ItemService) Create(
 
 	return item, nil
 }
+
+func (s *ItemService) GetAll(
+	search string,
+	userID string,
+	pageFilter PageFilter,
+) ([]struct {
+	Item   *entities.Item
+	Assets []*entities.Asset
+}, error) {
+	queryFilter := s.makeGetAllQueryFilter(search, userID)
+
+	items, err := s.itemRepository.GetByQueryFilters(*queryFilter, &repositories.PageFilter{
+		Offset: (pageFilter.Page - 1) * pageFilter.Size,
+		Limit:  pageFilter.Size,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var entitySlice []entities.Entity
+	for i := range items {
+		entitySlice = append(entitySlice, items[i])
+	}
+	assets, err := s.assetService.GetByEntities(entitySlice)
+	if err != nil {
+		return nil, err
+	}
+
+	assetsByID := make(map[string][]*entities.Asset)
+	for i := range assets {
+		assetsByID[assets[i].EntityID] = append(assetsByID[assets[i].EntityID], assets[i])
+	}
+
+	output := make([]struct {
+		Item   *entities.Item
+		Assets []*entities.Asset
+	}, 0)
+	for i := range items {
+		output = append(output, struct {
+			Item   *entities.Item
+			Assets []*entities.Asset
+		}{
+			Item:   items[i],
+			Assets: assetsByID[items[i].EntityID()],
+		})
+	}
+
+	return output, nil
+}
+
+func (s *ItemService) CountAll(
+	search string,
+	userID string,
+) (int64, error) {
+	queryFilter := s.makeGetAllQueryFilter(search, userID)
+
+	count, err := s.itemRepository.CountByQueryFilters(*queryFilter)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (s *ItemService) makeGetAllQueryFilter(
+	search string,
+	userID string,
+) *repositories.QueryFilter {
+	queryFilter := &repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "items.user_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    userID,
+					},
+				},
+			},
+		},
+	}
+
+	if search != "" {
+		searchConditionGroup := repositories.ConditionGroup{
+			Operator: repositories.OrLogicalOperator,
+			Conditions: []repositories.Condition{
+				{
+					Field:    "items.name",
+					Operator: repositories.LikeComparisonOperator,
+					Value:    "%" + search + "%",
+				},
+				{
+					Field:    "items.description",
+					Operator: repositories.LikeComparisonOperator,
+					Value:    "%" + search + "%",
+				},
+				{
+					Field:    "item_keywords.value",
+					Operator: repositories.LikeComparisonOperator,
+					Value:    "%" + search + "%",
+				},
+			},
+		}
+		queryFilter.ConditionGroups = append(
+			queryFilter.ConditionGroups,
+			searchConditionGroup,
+		)
+	}
+
+	return queryFilter
+}
