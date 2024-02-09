@@ -258,3 +258,41 @@ func TestAssetServiceDeleteErrorFromFileManager(t *testing.T) {
 	assetRepository.AssertExpectations(t)
 	fileManager.AssertExpectations(t)
 }
+
+func TestAssetServiceGetByEntities(t *testing.T) {
+	assetRepository := &stub.AssetRepositoryMock{}
+	fileManager := &serviceStubs.FileManagerMock{}
+	service := NewAssetService(fileManager, assetRepository)
+
+	theEntities := []entities.Entity{
+		entities.NewIdentifiableEntity(uuid.NewString()),
+	}
+
+	assetRepository.On("GetByQueryFilters", mock.AnythingOfType("repositories.QueryFilter")).
+		Return([]*entities.Asset{}, nil)
+
+	assets, err := service.GetByEntities(theEntities)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, assets)
+	assetRepository.AssertExpectations(t)
+}
+
+func TestAssetServiceGetByEntitiesErrorFromAssetRepository(t *testing.T) {
+	assetRepository := &stub.AssetRepositoryMock{}
+	fileManager := &serviceStubs.FileManagerMock{}
+	service := NewAssetService(fileManager, assetRepository)
+
+	theEntities := []entities.Entity{
+		entities.NewIdentifiableEntity(uuid.NewString()),
+	}
+
+	assetRepository.On("GetByQueryFilters", mock.AnythingOfType("repositories.QueryFilter")).
+		Return(nil, errors.New("repository error"))
+
+	assets, err := service.GetByEntities(theEntities)
+
+	assert.Error(t, err)
+	assert.Nil(t, assets)
+	assetRepository.AssertExpectations(t)
+}
