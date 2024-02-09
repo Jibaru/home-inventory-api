@@ -57,3 +57,15 @@ func (r *AssetRepository) Delete(id string) error {
 
 	return nil
 }
+
+func (r *AssetRepository) GetByQueryFilters(queryFilter repositories.QueryFilter) ([]*entities.Asset, error) {
+	var assets []*entities.Asset
+	result := applyFilters(r.db, queryFilter).Find(&assets)
+
+	if err := result.Error; err != nil {
+		logger.LogError(err)
+		return nil, repositories.ErrorAssetRepositoryCanNotGetByQueryFilters
+	}
+
+	return assets, nil
+}
