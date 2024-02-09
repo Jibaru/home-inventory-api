@@ -32,3 +32,15 @@ func (r *AssetRepositoryMock) Delete(id string) error {
 	args := r.Called(id)
 	return args.Error(0)
 }
+
+func (r *AssetRepositoryMock) GetByQueryFilters(
+	queryFilter repositories.QueryFilter,
+) ([]*entities.Asset, error) {
+	args := r.Called(queryFilter)
+
+	if data := args.Get(0); data != nil {
+		return data.([]*entities.Asset), args.Error(1)
+	}
+
+	return nil, args.Error(1)
+}
