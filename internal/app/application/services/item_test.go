@@ -235,3 +235,184 @@ func TestItemServiceCreateErrorOnItemKeywordRepository(t *testing.T) {
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
 }
+
+func TestItemServiceGetAll(t *testing.T) {
+	itemRepository := &stub.ItemRepositoryMock{}
+	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
+	assetService := &AssetServiceMock{}
+
+	itemService := NewItemService(
+		itemRepository,
+		itemKeywordRepository,
+		assetService,
+	)
+
+	itemRepository.On(
+		"GetByQueryFilters",
+		mock.AnythingOfType("repositories.QueryFilter"),
+		mock.AnythingOfType("*repositories.PageFilter"),
+	).
+		Return([]*entities.Item{
+			{
+				ID:          uuid.NewString(),
+				Sku:         random.String(10, random.Alphanumeric),
+				Name:        random.String(10, random.Alphanumeric),
+				Description: nil,
+				Unit:        "unit",
+				UserID:      uuid.NewString(),
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}, nil)
+	assetService.On("GetByEntities", mock.AnythingOfType("[]entities.Entity")).
+		Return([]*entities.Asset{
+			{
+				ID:         uuid.NewString(),
+				Name:       random.String(10, random.Alphanumeric),
+				Extension:  ".png",
+				Size:       12314,
+				FileID:     uuid.NewString(),
+				EntityID:   uuid.NewString(),
+				EntityName: "item",
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+		}, nil)
+
+	items, err := itemService.GetAll("search", uuid.NewString(), PageFilter{
+		Page: 1,
+		Size: 1,
+	})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, items)
+	assert.NotEmpty(t, items)
+	itemRepository.AssertExpectations(t)
+	itemKeywordRepository.AssertExpectations(t)
+	assetService.AssertExpectations(t)
+}
+
+func TestItemServiceGetAllErrorOnItemRepository(t *testing.T) {
+	itemRepository := &stub.ItemRepositoryMock{}
+	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
+	assetService := &AssetServiceMock{}
+
+	itemService := NewItemService(
+		itemRepository,
+		itemKeywordRepository,
+		assetService,
+	)
+
+	itemRepository.On(
+		"GetByQueryFilters",
+		mock.AnythingOfType("repositories.QueryFilter"),
+		mock.AnythingOfType("*repositories.PageFilter"),
+	).
+		Return(nil, errors.New("item repository error"))
+
+	items, err := itemService.GetAll("search", uuid.NewString(), PageFilter{
+		Page: 1,
+		Size: 1,
+	})
+
+	assert.Error(t, err)
+	assert.Nil(t, items)
+	itemRepository.AssertExpectations(t)
+	itemKeywordRepository.AssertExpectations(t)
+	assetService.AssertExpectations(t)
+}
+
+func TestItemServiceGetAllErrorOnAssetService(t *testing.T) {
+	itemRepository := &stub.ItemRepositoryMock{}
+	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
+	assetService := &AssetServiceMock{}
+
+	itemService := NewItemService(
+		itemRepository,
+		itemKeywordRepository,
+		assetService,
+	)
+
+	itemRepository.On(
+		"GetByQueryFilters",
+		mock.AnythingOfType("repositories.QueryFilter"),
+		mock.AnythingOfType("*repositories.PageFilter"),
+	).
+		Return([]*entities.Item{
+			{
+				ID:          uuid.NewString(),
+				Sku:         random.String(10, random.Alphanumeric),
+				Name:        random.String(10, random.Alphanumeric),
+				Description: nil,
+				Unit:        "unit",
+				UserID:      uuid.NewString(),
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}, nil)
+	assetService.On("GetByEntities", mock.AnythingOfType("[]entities.Entity")).
+		Return(nil, errors.New("asset service error"))
+
+	items, err := itemService.GetAll("search", uuid.NewString(), PageFilter{
+		Page: 1,
+		Size: 1,
+	})
+
+	assert.Error(t, err)
+	assert.Nil(t, items)
+	itemRepository.AssertExpectations(t)
+	itemKeywordRepository.AssertExpectations(t)
+	assetService.AssertExpectations(t)
+}
+
+func TestItemServiceCountAll(t *testing.T) {
+	itemRepository := &stub.ItemRepositoryMock{}
+	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
+	assetService := &AssetServiceMock{}
+
+	itemService := NewItemService(
+		itemRepository,
+		itemKeywordRepository,
+		assetService,
+	)
+
+	itemRepository.On(
+		"CountByQueryFilters",
+		mock.AnythingOfType("repositories.QueryFilter"),
+	).
+		Return(int64(1), nil)
+
+	count, err := itemService.CountAll("search", uuid.NewString())
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(1), count)
+	itemRepository.AssertExpectations(t)
+	itemKeywordRepository.AssertExpectations(t)
+	assetService.AssertExpectations(t)
+}
+
+func TestItemServiceCountAllErrorOnItemRepository(t *testing.T) {
+	itemRepository := &stub.ItemRepositoryMock{}
+	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
+	assetService := &AssetServiceMock{}
+
+	itemService := NewItemService(
+		itemRepository,
+		itemKeywordRepository,
+		assetService,
+	)
+
+	itemRepository.On(
+		"CountByQueryFilters",
+		mock.AnythingOfType("repositories.QueryFilter"),
+	).
+		Return(int64(0), errors.New("item repository error"))
+
+	count, err := itemService.CountAll("search", uuid.NewString())
+
+	assert.Error(t, err)
+	assert.Equal(t, int64(0), count)
+	itemRepository.AssertExpectations(t)
+	itemKeywordRepository.AssertExpectations(t)
+	assetService.AssertExpectations(t)
+}
