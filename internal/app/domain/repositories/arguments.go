@@ -8,6 +8,7 @@ const (
 const (
 	LikeComparisonOperator  ComparisonOperator = "LIKE"
 	EqualComparisonOperator ComparisonOperator = "="
+	InComparisonOperator    ComparisonOperator = "IN"
 )
 
 type ComparisonOperator string
