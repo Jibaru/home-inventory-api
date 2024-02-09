@@ -36,3 +36,37 @@ func (r *ItemRepository) GetByID(id string) (*entities.Item, error) {
 
 	return &item, nil
 }
+
+func (r *ItemRepository) GetByQueryFilters(queryFilter repositories.QueryFilter, pageFilter *repositories.PageFilter) ([]*entities.Item, error) {
+	var items []*entities.Item
+	err := applyFilters(r.db, queryFilter).
+		Joins("inner join item_keywords on item_keywords.item_id = items.id").
+		Offset(pageFilter.Offset).
+		Limit(pageFilter.Limit).
+		Preload("Keywords").
+		Find(&items).
+		Error
+
+	if err != nil {
+		logger.LogError(err)
+		return nil, repositories.ErrItemRepositoryCanNotGetByQueryFilters
+	}
+
+	return items, nil
+}
+
+func (r *ItemRepository) CountByQueryFilters(queryFilter repositories.QueryFilter) (int64, error) {
+	var count int64
+	err := applyFilters(r.db, queryFilter).
+		Joins("inner join item_keywords on item_keywords.item_id = items.id").
+		Model(&entities.Item{}).
+		Count(&count).
+		Error
+
+	if err != nil {
+		logger.LogError(err)
+		return 0, repositories.ErrItemRepositoryCanNotCountByQueryFilters
+	}
+
+	return count, nil
+}
