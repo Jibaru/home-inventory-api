@@ -13,6 +13,7 @@ type AssetServiceInterface interface {
 	GetUrl(asset *entities.Asset) string
 	GetByEntity(entity entities.Entity, pageFilter *PageFilter) ([]*entities.Asset, error)
 	Delete(asset *entities.Asset) error
+	GetByEntities(entities []entities.Entity) ([]*entities.Asset, error)
 }
 
 type AssetService struct {
@@ -88,6 +89,45 @@ func (s *AssetService) Delete(asset *entities.Asset) error {
 	return nil
 }
 
+func (s *AssetService) GetByEntities(theEntities []entities.Entity) ([]*entities.Asset, error) {
+	if len(theEntities) == 0 {
+		assets := make([]*entities.Asset, 0)
+		return assets, nil
+	}
+
+	ids := make([]string, 0)
+	for _, entity := range theEntities {
+		ids = append(ids, entity.EntityID())
+	}
+
+	queryFilter := repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "entity_id",
+						Operator: repositories.InComparisonOperator,
+						Value:    ids,
+					},
+					{
+						Field:    "entity_name",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    theEntities[0].EntityName(),
+					},
+				},
+			},
+		},
+	}
+
+	assets, err := s.assetRepository.GetByQueryFilters(queryFilter)
+	if err != nil {
+		return nil, err
+	}
+
+	return assets, nil
+}
+
 type AssetServiceMock struct {
 	mock.Mock
 }
@@ -120,4 +160,16 @@ func (s *AssetServiceMock) GetByEntity(entity entities.Entity, pageFilter *PageF
 func (s *AssetServiceMock) Delete(asset *entities.Asset) error {
 	args := s.Called(asset)
 	return args.Error(0)
+}
+
+func (s *AssetServiceMock) GetByEntities(
+	theEntities []entities.Entity,
+) ([]*entities.Asset, error) {
+	args := s.Called(theEntities)
+
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
+	return args.Get(0).([]*entities.Asset), args.Error(1)
 }
