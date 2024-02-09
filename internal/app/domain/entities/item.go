@@ -45,6 +45,7 @@ type Item struct {
 	Description *string
 	Unit        string
 	UserID      string
+	Keywords    []*ItemKeyword
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
