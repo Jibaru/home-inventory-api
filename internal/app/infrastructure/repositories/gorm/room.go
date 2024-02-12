@@ -69,3 +69,13 @@ func (r *RoomRepository) CountByQueryFilters(queryFilter repositories.QueryFilte
 
 	return count, nil
 }
+
+func (r *RoomRepository) Delete(id string) error {
+	err := r.db.Where("id = ?", id).Delete(&entities.Room{}).Error
+	if err != nil {
+		logger.LogError(err)
+		return repositories.ErrRoomRepositoryCanNotDeleteRoom
+	}
+
+	return nil
+}
