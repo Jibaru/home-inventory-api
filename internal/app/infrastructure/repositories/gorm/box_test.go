@@ -525,3 +525,120 @@ func TestBoxRepositoryCountByQueryFiltersErrorBoxRepositoryCanNotCountByQueryFil
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestBoxRepositoryDeleteBoxItemsByBoxID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `box_items` WHERE box_id = ?")).
+		WithArgs(boxID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	dbMock.ExpectCommit()
+
+	err := boxRepository.DeleteBoxItemsByBoxID(boxID)
+
+	assert.NoError(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryDeleteBoxItemsByBoxIDErrorBoxRepositoryCanNotDeleteBoxItemsByBoxID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `box_items` WHERE box_id = ?")).
+		WithArgs(boxID).
+		WillReturnError(errors.New("database error"))
+	dbMock.ExpectRollback()
+
+	err := boxRepository.DeleteBoxItemsByBoxID(boxID)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrBoxRepositoryCanNotDeleteBoxItemsByBoxID)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryDeleteBoxTransactionsByBoxID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `box_transactions` WHERE box_id = ?")).
+		WithArgs(boxID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	dbMock.ExpectCommit()
+
+	err := boxRepository.DeleteBoxTransactionsByBoxID(boxID)
+
+	assert.NoError(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryDeleteBoxTransactionsByBoxIDErrorBoxRepositoryCanNotDeleteBoxTransactionsByBoxID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `box_transactions` WHERE box_id = ?")).
+		WithArgs(boxID).
+		WillReturnError(errors.New("database error"))
+	dbMock.ExpectRollback()
+
+	err := boxRepository.DeleteBoxTransactionsByBoxID(boxID)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrBoxRepositoryCanNotDeleteBoxTransactionsByBoxID)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryDelete(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `boxes` WHERE id = ?")).
+		WithArgs(boxID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	dbMock.ExpectCommit()
+
+	err := boxRepository.Delete(boxID)
+
+	assert.NoError(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryDeleteErrorBoxRepositoryCanNotDeleteBox(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `boxes` WHERE id = ?")).
+		WithArgs(boxID).
+		WillReturnError(errors.New("database error"))
+	dbMock.ExpectRollback()
+
+	err := boxRepository.Delete(boxID)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrBoxRepositoryCanNotDeleteBox)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
