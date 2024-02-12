@@ -598,3 +598,47 @@ func TestBoxServiceCountAllErrorInBoxRepository(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 }
+
+func TestBoxServiceTransferItem(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	originBoxID := uuid.NewString()
+	destinationBoxID := uuid.NewString()
+	itemID := uuid.NewString()
+
+	itemRepository.On("GetByID", itemID).
+		Return(&entities.Item{
+			ID: itemID,
+		}, nil)
+	boxRepository.On("GetBoxItem", originBoxID, itemID).
+		Return(&entities.BoxItem{
+			BoxID:    originBoxID,
+			ItemID:   itemID,
+			Quantity: 10.0,
+		}, nil)
+	boxRepository.On("GetBoxItem", destinationBoxID, itemID).
+		Return(&entities.BoxItem{
+			BoxID:    originBoxID,
+			ItemID:   itemID,
+			Quantity: 10.0,
+		}, nil)
+	boxRepository.On("DeleteBoxItem", originBoxID, itemID).
+		Return(nil)
+	boxRepository.On("CreateBoxTransaction", mock.AnythingOfType("*entities.BoxTransaction")).
+		Return(nil)
+	boxRepository.On("UpdateBoxItem", mock.AnythingOfType("*entities.BoxItem")).
+		Return(nil)
+
+	err := boxService.TransferItem(originBoxID, destinationBoxID, itemID)
+
+	time.Sleep(2 * time.Second)
+
+	assert.NoError(t, err)
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
