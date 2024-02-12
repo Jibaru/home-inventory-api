@@ -39,3 +39,8 @@ func (m *RoomRepositoryMock) CountByQueryFilters(
 	args := m.Called(queryFilter)
 	return args.Get(0).(int64), args.Error(1)
 }
+
+func (m *RoomRepositoryMock) Delete(id string) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
