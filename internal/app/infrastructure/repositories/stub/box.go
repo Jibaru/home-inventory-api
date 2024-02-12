@@ -62,3 +62,18 @@ func (m *BoxRepositoryMock) CountByQueryFilters(queryFilter repositories.QueryFi
 	args := m.Called(queryFilter)
 	return args.Get(0).(int64), args.Error(1)
 }
+
+func (m *BoxRepositoryMock) DeleteBoxItemsByBoxID(boxID string) error {
+	args := m.Called(boxID)
+	return args.Error(0)
+}
+
+func (m *BoxRepositoryMock) DeleteBoxTransactionsByBoxID(boxID string) error {
+	args := m.Called(boxID)
+	return args.Error(0)
+}
+
+func (m *BoxRepositoryMock) Delete(id string) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
