@@ -642,3 +642,99 @@ func TestBoxServiceTransferItem(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 }
+
+func TestBoxServiceDeleteWithTransactionsAndItemQuantities(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+
+	boxRepository.On("DeleteBoxTransactionsByBoxID", boxID).
+		Return(nil)
+	boxRepository.On("DeleteBoxItemsByBoxID", boxID).
+		Return(nil)
+	boxRepository.On("Delete", boxID).
+		Return(nil)
+
+	err := boxService.DeleteWithTransactionsAndItemQuantities(boxID)
+
+	assert.NoError(t, err)
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOnDeleteBoxTransactionsByBoxID(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+
+	mockError := errors.New("repository error")
+	boxRepository.On("DeleteBoxTransactionsByBoxID", boxID).
+		Return(mockError)
+
+	err := boxService.DeleteWithTransactionsAndItemQuantities(boxID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOnDeleteBoxItemsByBoxID(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+
+	mockError := errors.New("repository error")
+	boxRepository.On("DeleteBoxTransactionsByBoxID", boxID).
+		Return(nil)
+	boxRepository.On("DeleteBoxItemsByBoxID", boxID).
+		Return(mockError)
+
+	err := boxService.DeleteWithTransactionsAndItemQuantities(boxID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOnDeleteBox(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+
+	mockError := errors.New("repository error")
+	boxRepository.On("DeleteBoxItemsByBoxID", boxID).
+		Return(nil)
+	boxRepository.On("DeleteBoxTransactionsByBoxID", boxID).
+		Return(nil)
+	boxRepository.On("Delete", boxID).
+		Return(mockError)
+
+	err := boxService.DeleteWithTransactionsAndItemQuantities(boxID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
