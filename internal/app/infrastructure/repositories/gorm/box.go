@@ -101,3 +101,30 @@ func (r *BoxRepository) CountByQueryFilters(queryFilter repositories.QueryFilter
 
 	return count, nil
 }
+
+func (r *BoxRepository) DeleteBoxItemsByBoxID(boxID string) error {
+	if err := r.db.Where("box_id = ?", boxID).Delete(&entities.BoxItem{}).Error; err != nil {
+		logger.LogError(err)
+		return repositories.ErrBoxRepositoryCanNotDeleteBoxItemsByBoxID
+	}
+
+	return nil
+}
+
+func (r *BoxRepository) DeleteBoxTransactionsByBoxID(boxID string) error {
+	if err := r.db.Where("box_id = ?", boxID).Delete(&entities.BoxTransaction{}).Error; err != nil {
+		logger.LogError(err)
+		return repositories.ErrBoxRepositoryCanNotDeleteBoxTransactionsByBoxID
+	}
+
+	return nil
+}
+
+func (r *BoxRepository) Delete(id string) error {
+	if err := r.db.Where("id = ?", id).Delete(&entities.Box{}).Error; err != nil {
+		logger.LogError(err)
+		return repositories.ErrBoxRepositoryCanNotDeleteBox
+	}
+
+	return nil
+}
