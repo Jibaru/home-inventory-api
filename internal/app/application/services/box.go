@@ -301,3 +301,36 @@ func (s *BoxService) makeGetAllQueryFilter(
 
 	return queryFilter
 }
+
+func (s *BoxService) TransferItem(
+	fromBoxID string,
+	toBoxID string,
+	itemID string,
+) error {
+	fromBoxItem, err := s.boxRepository.GetBoxItem(fromBoxID, itemID)
+	if err != nil {
+		return err
+	}
+
+	quantity := fromBoxItem.Quantity
+
+	err = s.RemoveItemFromBox(
+		quantity,
+		fromBoxID,
+		itemID,
+	)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.AddItemIntoBox(
+		quantity,
+		toBoxID,
+		itemID,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
