@@ -39,7 +39,7 @@ func RunServer(
 	authService := services.NewAuthService(userRepository, tokenGenerator)
 	userService := services.NewUserService(userRepository)
 	versionService := services.NewVersionService(versionRepository)
-	roomService := services.NewRoomService(roomRepository)
+	roomService := services.NewRoomService(roomRepository, boxRepository)
 	boxService := services.NewBoxService(boxRepository, itemRepository, roomRepository)
 	itemService := services.NewItemService(itemRepository, itemKeywordRepository, assetService)
 
@@ -57,6 +57,7 @@ func RunServer(
 	getItemsController := controllers.NewGetItemsController(assetService, itemService)
 	transferItemController := controllers.NewTransferItemController(boxService)
 	deleteBoxController := controllers.NewDeleteBoxController(boxService)
+	deleteRoomController := controllers.NewDeleteRoomController(roomService)
 
 	loggerMiddleware := middlewares.NewLoggerMiddleware()
 	needsAuthMiddleware := middlewares.NewNeedsAuthMiddleware(authService)
@@ -81,6 +82,7 @@ func RunServer(
 	authApi.GET("/items", getItemsController.Handle)
 	authApi.POST("/boxes/:boxID/items/:itemID/transfer", transferItemController.Handle)
 	authApi.DELETE("/boxes/:boxID", deleteBoxController.Handle)
+	authApi.DELETE("/rooms/:roomID", deleteRoomController.Handle)
 
 	logger.LogError(e.Start(host + ":" + port))
 }

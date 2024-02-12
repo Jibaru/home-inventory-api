@@ -267,3 +267,42 @@ func TestRoomRepositoryCountByQueryFiltersErrorCanNotCountRooms(t *testing.T) {
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestRoomRepositoryDelete(t *testing.T) {
+	db, dbMock := makeDBMock()
+	roomRepository := NewRoomRepository(db)
+
+	roomID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `rooms` WHERE id = ?")).
+		WithArgs(roomID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	dbMock.ExpectCommit()
+
+	err := roomRepository.Delete(roomID)
+
+	assert.NoError(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestRoomRepositoryDeleteErrorCanNotDeleteRoom(t *testing.T) {
+	db, dbMock := makeDBMock()
+	roomRepository := NewRoomRepository(db)
+
+	roomID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `rooms` WHERE id = ?")).
+		WithArgs(roomID).
+		WillReturnError(errors.New("database error"))
+	dbMock.ExpectRollback()
+
+	err := roomRepository.Delete(roomID)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrRoomRepositoryCanNotDeleteRoom)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}

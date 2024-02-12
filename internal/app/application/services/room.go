@@ -1,19 +1,27 @@
 package services
 
 import (
+	"errors"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 )
 
+var (
+	ErrRoomServiceCanNotDeleteRoomWithBoxes = errors.New("can not delete room with boxes")
+)
+
 type RoomService struct {
 	roomRepository repositories.RoomRepository
+	boxRepository  repositories.BoxRepository
 }
 
 func NewRoomService(
 	roomRepository repositories.RoomRepository,
+	boxRepository repositories.BoxRepository,
 ) *RoomService {
 	return &RoomService{
 		roomRepository,
+		boxRepository,
 	}
 }
 
@@ -105,4 +113,35 @@ func (s *RoomService) makeGetAllQueryFilter(
 	}
 
 	return queryFilter
+}
+
+func (s *RoomService) Delete(roomID string) error {
+	totalBoxes, err := s.boxRepository.CountByQueryFilters(repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "room_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    roomID,
+					},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	if totalBoxes > 0 {
+		return ErrRoomServiceCanNotDeleteRoomWithBoxes
+	}
+
+	err = s.roomRepository.Delete(roomID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

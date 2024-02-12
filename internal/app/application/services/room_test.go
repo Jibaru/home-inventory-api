@@ -13,7 +13,8 @@ import (
 
 func TestRoomServiceCreateRoom(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
-	roomService := NewRoomService(roomRepository)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
 
 	name := random.String(100, random.Alphanumeric)
 	description := random.String(255, random.Alphanumeric)
@@ -30,11 +31,13 @@ func TestRoomServiceCreateRoom(t *testing.T) {
 	assert.Equal(t, description, *room.Description)
 	assert.Equal(t, userID, room.UserID)
 	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
 }
 
 func TestRoomServiceCreateRoomErrorInRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
-	roomService := NewRoomService(roomRepository)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
 
 	name := random.String(100, random.Alphanumeric)
 	userID := uuid.NewString()
@@ -48,11 +51,13 @@ func TestRoomServiceCreateRoomErrorInRepository(t *testing.T) {
 	assert.Nil(t, room)
 	assert.EqualError(t, err, mockError.Error())
 	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
 }
 
 func TestRoomServiceGetAll(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
-	roomService := NewRoomService(roomRepository)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
 
 	search := random.String(100, random.Alphanumeric)
 	userID := uuid.NewString()
@@ -78,11 +83,13 @@ func TestRoomServiceGetAll(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.Equal(t, rooms, result)
 	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
 }
 
 func TestRoomServiceGetAllErrorInRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
-	roomService := NewRoomService(roomRepository)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
 
 	search := random.String(100, random.Alphanumeric)
 	userID := uuid.NewString()
@@ -104,11 +111,13 @@ func TestRoomServiceGetAllErrorInRepository(t *testing.T) {
 	assert.Nil(t, result)
 	assert.EqualError(t, err, mockError.Error())
 	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
 }
 
 func TestRoomServiceCountAll(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
-	roomService := NewRoomService(roomRepository)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
 
 	search := random.String(100, random.Alphanumeric)
 	userID := uuid.NewString()
@@ -121,11 +130,13 @@ func TestRoomServiceCountAll(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, count, result)
 	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
 }
 
 func TestRoomServiceCountAllErrorInRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
-	roomService := NewRoomService(roomRepository)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
 
 	search := random.String(100, random.Alphanumeric)
 	userID := uuid.NewString()
@@ -139,4 +150,62 @@ func TestRoomServiceCountAllErrorInRepository(t *testing.T) {
 	assert.Equal(t, int64(0), result)
 	assert.EqualError(t, err, mockError.Error())
 	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
+}
+
+func TestRoomServiceDelete(t *testing.T) {
+	roomRepository := new(stub.RoomRepositoryMock)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
+
+	roomID := uuid.NewString()
+
+	boxRepository.On("CountByQueryFilters", mock.AnythingOfType("repositories.QueryFilter")).
+		Return(int64(0), nil)
+	roomRepository.On("Delete", roomID).
+		Return(nil)
+
+	err := roomService.Delete(roomID)
+
+	assert.NoError(t, err)
+	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
+}
+
+func TestRoomServiceDeleteErrorInRepository(t *testing.T) {
+	roomRepository := new(stub.RoomRepositoryMock)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
+
+	roomID := uuid.NewString()
+
+	mockError := errors.New("repository error")
+	boxRepository.On("CountByQueryFilters", mock.AnythingOfType("repositories.QueryFilter")).
+		Return(int64(0), nil)
+	roomRepository.On("Delete", roomID).Return(mockError)
+
+	err := roomService.Delete(roomID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
+}
+
+func TestRoomServiceDeleteErrorCanNotDeleteRoomWithBoxes(t *testing.T) {
+	roomRepository := new(stub.RoomRepositoryMock)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
+
+	roomID := uuid.NewString()
+
+	boxRepository.On("CountByQueryFilters", mock.AnythingOfType("repositories.QueryFilter")).
+		Return(int64(1), nil)
+
+	err := roomService.Delete(roomID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, "can not delete room with boxes")
+	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
 }
