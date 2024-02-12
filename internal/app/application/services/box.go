@@ -334,3 +334,22 @@ func (s *BoxService) TransferItem(
 
 	return nil
 }
+
+func (s *BoxService) DeleteWithTransactionsAndItemQuantities(boxID string) error {
+	err := s.boxRepository.DeleteBoxTransactionsByBoxID(boxID)
+	if err != nil {
+		return err
+	}
+
+	err = s.boxRepository.DeleteBoxItemsByBoxID(boxID)
+	if err != nil {
+		return err
+	}
+
+	err = s.boxRepository.Delete(boxID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
