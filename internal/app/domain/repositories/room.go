@@ -10,6 +10,7 @@ var (
 	ErrRoomRepositoryCanNotCountRooms            = errors.New("can not count rooms")
 	ErrRoomRepositoryCanNotCreateRoom            = errors.New("can not create room")
 	ErrRoomRepositoryCanNotGetRooms              = errors.New("can not get rooms")
+	ErrRoomRepositoryCanNotDeleteRoom            = errors.New("can not delete room")
 )
 
 type RoomRepository interface {
@@ -17,4 +18,5 @@ type RoomRepository interface {
 	ExistsByID(id string) (bool, error)
 	GetByQueryFilters(queryFilter QueryFilter, pageFilter *PageFilter) ([]*entities.Room, error)
 	CountByQueryFilters(queryFilter QueryFilter) (int64, error)
+	Delete(id string) error
 }
