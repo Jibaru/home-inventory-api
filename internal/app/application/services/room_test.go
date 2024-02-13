@@ -209,3 +209,80 @@ func TestRoomServiceDeleteErrorCanNotDeleteRoomWithBoxes(t *testing.T) {
 	roomRepository.AssertExpectations(t)
 	boxRepository.AssertExpectations(t)
 }
+
+func TestRoomServiceUpdate(t *testing.T) {
+	roomRepository := new(stub.RoomRepositoryMock)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
+
+	roomID := uuid.NewString()
+	name := random.String(100, random.Alphanumeric)
+	description := random.String(255, random.Alphanumeric)
+
+	room := &entities.Room{
+		ID:          roomID,
+		Name:        name,
+		Description: &description,
+	}
+
+	roomRepository.On("GetByID", roomID).Return(room, nil)
+	roomRepository.On("Update", room).Return(nil)
+
+	room, err := roomService.Update(roomID, name, &description)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, room)
+	assert.Equal(t, name, room.Name)
+	assert.Equal(t, description, *room.Description)
+	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
+}
+
+func TestRoomServiceUpdateErrorInRepositoryOnGetByID(t *testing.T) {
+	roomRepository := new(stub.RoomRepositoryMock)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
+
+	roomID := uuid.NewString()
+	name := random.String(100, random.Alphanumeric)
+	description := random.String(255, random.Alphanumeric)
+
+	mockError := errors.New("repository error")
+	roomRepository.On("GetByID", roomID).Return(nil, mockError)
+
+	room, err := roomService.Update(roomID, name, &description)
+
+	assert.Error(t, err)
+	assert.Nil(t, room)
+	assert.EqualError(t, err, mockError.Error())
+	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
+}
+
+func TestRoomServiceUpdateErrorInRepositoryOnUpdate(t *testing.T) {
+	roomRepository := new(stub.RoomRepositoryMock)
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomService := NewRoomService(roomRepository, boxRepository)
+
+	roomID := uuid.NewString()
+	name := random.String(100, random.Alphanumeric)
+	description := random.String(255, random.Alphanumeric)
+
+	mockError := errors.New("repository error")
+	room := &entities.Room{
+		ID:          roomID,
+		Name:        name,
+		Description: &description,
+	}
+
+	roomRepository.On("GetByID", roomID).Return(room, nil)
+	roomRepository.On("Update", room).Return(mockError)
+
+	room, err := roomService.Update(roomID, name, &description)
+
+	assert.Error(t, err)
+	assert.Nil(t, room)
+	assert.EqualError(t, err, mockError.Error())
+	roomRepository.AssertExpectations(t)
+	boxRepository.AssertExpectations(t)
+}

@@ -44,3 +44,18 @@ func (m *RoomRepositoryMock) Delete(id string) error {
 	args := m.Called(id)
 	return args.Error(0)
 }
+
+func (m *RoomRepositoryMock) GetByID(id string) (*entities.Room, error) {
+	args := m.Called(id)
+
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
+	return args.Get(0).(*entities.Room), args.Error(1)
+}
+
+func (m *RoomRepositoryMock) Update(room *entities.Room) error {
+	args := m.Called(room)
+	return args.Error(0)
+}
