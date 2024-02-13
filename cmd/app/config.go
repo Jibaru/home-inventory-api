@@ -18,6 +18,7 @@ type AppConfig struct {
 	AwsSecretAccessKey string `mapstructure:"AWS_SECRET_ACCESS_KEY"`
 	AwsRegion          string `mapstructure:"AWS_REGION"`
 	S3BucketName       string `mapstructure:"S3_BUCKET_NAME"`
+	SentryDSN          string `mapstructure:"SENTRY_DSN"`
 }
 
 func ReadConfig() (*AppConfig, error) {

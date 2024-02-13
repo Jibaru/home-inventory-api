@@ -4,6 +4,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 	"github.com/jibaru/home-inventory-api/m/logger"
+	"github.com/jibaru/home-inventory-api/m/notifier"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +21,7 @@ func NewRoomRepository(db *gorm.DB) *RoomRepository {
 func (r *RoomRepository) Create(room *entities.Room) error {
 	if err := r.db.Create(room).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrRoomRepositoryCanNotCreateRoom
 	}
 
@@ -74,6 +76,7 @@ func (r *RoomRepository) Delete(id string) error {
 	err := r.db.Where("id = ?", id).Delete(&entities.Room{}).Error
 	if err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrRoomRepositoryCanNotDeleteRoom
 	}
 

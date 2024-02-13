@@ -4,6 +4,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/database"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/http"
 	"github.com/jibaru/home-inventory-api/m/logger"
+	"github.com/jibaru/home-inventory-api/m/notifier"
 	"strconv"
 	"time"
 )
@@ -14,6 +15,13 @@ func main() {
 		logger.LogError(err)
 		return
 	}
+
+	err = notifier.Init(config.SentryDSN)
+	if err != nil {
+		logger.LogError(err)
+		return
+	}
+	defer notifier.Flush()
 
 	db, err := database.CreateConnection(
 		database.DBConfig{
