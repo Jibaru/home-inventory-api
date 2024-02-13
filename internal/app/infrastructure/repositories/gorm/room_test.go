@@ -306,3 +306,104 @@ func TestRoomRepositoryDeleteErrorCanNotDeleteRoom(t *testing.T) {
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestRoomRepositoryGetByID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	roomRepository := NewRoomRepository(db)
+
+	roomID := uuid.NewString()
+	roomName := random.String(100, random.Alphanumeric)
+	roomDescription := random.String(255, random.Alphanumeric)
+	userID := uuid.NewString()
+	createdAt := time.Now()
+	updatedAt := time.Now()
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `rooms` WHERE id = ?")).
+		WithArgs(roomID).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "description", "user_id", "created_at", "updated_at"}).
+			AddRow(roomID, roomName, roomDescription, userID, createdAt, updatedAt))
+
+	room, err := roomRepository.GetByID(roomID)
+
+	assert.NoError(t, err)
+	assert.Equal(t, roomID, room.ID)
+	assert.Equal(t, roomName, room.Name)
+	assert.Equal(t, roomDescription, *room.Description)
+	assert.Equal(t, userID, room.UserID)
+	assert.Equal(t, createdAt, room.CreatedAt)
+	assert.Equal(t, updatedAt, room.UpdatedAt)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestRoomRepositoryGetByIDErrorCanNotGetRoomByID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	roomRepository := NewRoomRepository(db)
+
+	roomID := uuid.NewString()
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `rooms` WHERE id = ?")).
+		WithArgs(roomID).
+		WillReturnError(errors.New("database error"))
+
+	room, err := roomRepository.GetByID(roomID)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrRoomRepositoryCanNotGetRoomByID)
+	assert.Nil(t, room)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestRoomRepositoryUpdate(t *testing.T) {
+	db, dbMock := makeDBMock()
+	roomRepository := NewRoomRepository(db)
+
+	room := &entities.Room{
+		ID:          uuid.NewString(),
+		Name:        random.String(100, random.Alphanumeric),
+		Description: nil,
+		UserID:      uuid.NewString(),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("UPDATE `rooms` SET `name`=?,`description`=?,`user_id`=?,`created_at`=?,`updated_at`=? WHERE `id` = ?")).
+		WithArgs(room.Name, nil, room.UserID, room.CreatedAt, sqlmock.AnyArg(), room.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	dbMock.ExpectCommit()
+
+	err := roomRepository.Update(room)
+
+	assert.NoError(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestRoomRepositoryUpdateErrorCanNotUpdateRoom(t *testing.T) {
+	db, dbMock := makeDBMock()
+	roomRepository := NewRoomRepository(db)
+
+	room := &entities.Room{
+		ID:          uuid.NewString(),
+		Name:        random.String(100, random.Alphanumeric),
+		Description: nil,
+		UserID:      uuid.NewString(),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("UPDATE `rooms` SET `name`=?,`description`=?,`user_id`=?,`created_at`=?,`updated_at`=? WHERE `id` = ?")).
+		WithArgs(room.Name, nil, room.UserID, room.CreatedAt, sqlmock.AnyArg(), room.ID).
+		WillReturnError(errors.New("database error"))
+	dbMock.ExpectRollback()
+
+	err := roomRepository.Update(room)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrRoomRepositoryCanNotUpdateRoom)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
