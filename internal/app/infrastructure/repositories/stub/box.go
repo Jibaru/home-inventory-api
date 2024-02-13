@@ -77,3 +77,18 @@ func (m *BoxRepositoryMock) Delete(id string) error {
 	args := m.Called(id)
 	return args.Error(0)
 }
+
+func (m *BoxRepositoryMock) GetByID(id string) (*entities.Box, error) {
+	args := m.Called(id)
+
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
+	return args.Get(0).(*entities.Box), args.Error(1)
+}
+
+func (m *BoxRepositoryMock) Update(box *entities.Box) error {
+	args := m.Called(box)
+	return args.Error(0)
+}
