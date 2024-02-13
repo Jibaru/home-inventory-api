@@ -15,8 +15,10 @@ var (
 	ErrBoxRepositoryCanNotDeleteBoxItemsByBoxID        = errors.New("can not delete box items by box id")
 	ErrBoxRepositoryCanNotDeleteBoxTransactionsByBoxID = errors.New("can not delete box transactions by box id")
 	ErrBoxRepositoryCanNotUpdateBoxItem                = errors.New("can not update box item")
-	ErrorBoxRepositoryCanNotCountByQueryFilters        = errors.New("can not count by query filters")
-	ErrorBoxRepositoryCanNotGetByQueryFilters          = errors.New("can not get by query filters")
+	ErrBoxRepositoryCanNotCountByQueryFilters          = errors.New("can not count by query filters")
+	ErrBoxRepositoryCanNotGetByQueryFilters            = errors.New("can not get by query filters")
+	ErrBoxRepositoryCanNotGetByID                      = errors.New("can not get by id")
+	ErrBoxRepositoryCanNotUpdate                       = errors.New("can not update")
 )
 
 type BoxRepository interface {
@@ -31,4 +33,6 @@ type BoxRepository interface {
 	DeleteBoxItemsByBoxID(boxID string) error
 	DeleteBoxTransactionsByBoxID(boxID string) error
 	Delete(id string) error
+	GetByID(id string) (*entities.Box, error)
+	Update(box *entities.Box) error
 }
