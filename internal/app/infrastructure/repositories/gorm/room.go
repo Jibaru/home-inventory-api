@@ -82,3 +82,25 @@ func (r *RoomRepository) Delete(id string) error {
 
 	return nil
 }
+
+func (r *RoomRepository) GetByID(id string) (*entities.Room, error) {
+	var room entities.Room
+	err := r.db.Where("id = ?", id).First(&room).Error
+	if err != nil {
+		logger.LogError(err)
+		return nil, repositories.ErrRoomRepositoryCanNotGetRoomByID
+	}
+
+	return &room, nil
+}
+
+func (r *RoomRepository) Update(room *entities.Room) error {
+	err := r.db.Save(room).Error
+	if err != nil {
+		logger.LogError(err)
+		notifier.NotifyError(err)
+		return repositories.ErrRoomRepositoryCanNotUpdateRoom
+	}
+
+	return nil
+}
