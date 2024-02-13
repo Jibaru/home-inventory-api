@@ -353,3 +353,24 @@ func (s *BoxService) DeleteWithTransactionsAndItemQuantities(boxID string) error
 
 	return nil
 }
+
+func (s *BoxService) Update(
+	boxID string,
+	name string,
+	description *string,
+) (*entities.Box, error) {
+	box, err := s.boxRepository.GetByID(boxID)
+	if err != nil {
+		return nil, err
+	}
+
+	box.Name = name
+	box.Description = description
+
+	err = s.boxRepository.Update(box)
+	if err != nil {
+		return nil, err
+	}
+
+	return box, nil
+}

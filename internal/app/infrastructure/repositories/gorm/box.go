@@ -88,7 +88,7 @@ func (r *BoxRepository) GetByQueryFilters(queryFilter repositories.QueryFilter, 
 
 	if err != nil {
 		logger.LogError(err)
-		return nil, repositories.ErrorBoxRepositoryCanNotGetByQueryFilters
+		return nil, repositories.ErrBoxRepositoryCanNotGetByQueryFilters
 	}
 
 	return boxes, nil
@@ -103,7 +103,7 @@ func (r *BoxRepository) CountByQueryFilters(queryFilter repositories.QueryFilter
 
 	if err != nil {
 		logger.LogError(err)
-		return 0, repositories.ErrorBoxRepositoryCanNotCountByQueryFilters
+		return 0, repositories.ErrBoxRepositoryCanNotCountByQueryFilters
 	}
 
 	return count, nil
@@ -134,6 +134,26 @@ func (r *BoxRepository) Delete(id string) error {
 		logger.LogError(err)
 		notifier.NotifyError(err)
 		return repositories.ErrBoxRepositoryCanNotDeleteBox
+	}
+
+	return nil
+}
+
+func (r *BoxRepository) GetByID(id string) (*entities.Box, error) {
+	var box entities.Box
+	if err := r.db.Where("id = ?", id).First(&box).Error; err != nil {
+		logger.LogError(err)
+		return nil, repositories.ErrBoxRepositoryCanNotGetByID
+	}
+
+	return &box, nil
+}
+
+func (r *BoxRepository) Update(box *entities.Box) error {
+	if err := r.db.Save(box).Error; err != nil {
+		logger.LogError(err)
+		notifier.NotifyError(err)
+		return repositories.ErrBoxRepositoryCanNotUpdate
 	}
 
 	return nil

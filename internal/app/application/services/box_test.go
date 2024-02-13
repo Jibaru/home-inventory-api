@@ -738,3 +738,91 @@ func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOn
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 }
+
+func TestBoxServiceUpdate(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	name := "box"
+	description := "description"
+
+	boxRepository.On("GetByID", boxID).
+		Return(&entities.Box{
+			ID:          boxID,
+			Name:        name,
+			Description: &description,
+		}, nil)
+	boxRepository.On("Update", mock.AnythingOfType("*entities.Box")).
+		Return(nil)
+
+	box, err := boxService.Update(boxID, name, &description)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, box)
+	assert.Equal(t, boxID, box.ID)
+	assert.Equal(t, name, box.Name)
+	assert.Equal(t, description, *box.Description)
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceUpdateErrorInBoxRepositoryOnGetByID(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	name := "box"
+	description := "description"
+
+	mockError := errors.New("repository error")
+	boxRepository.On("GetByID", boxID).
+		Return(nil, mockError)
+
+	box, err := boxService.Update(boxID, name, &description)
+
+	assert.Error(t, err)
+	assert.Nil(t, box)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceUpdateErrorInBoxRepositoryOnUpdate(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	name := "box"
+	description := "description"
+
+	mockError := errors.New("repository error")
+	boxRepository.On("GetByID", boxID).
+		Return(&entities.Box{
+			ID:          boxID,
+			Name:        name,
+			Description: &description,
+		}, nil)
+	boxRepository.On("Update", mock.AnythingOfType("*entities.Box")).
+		Return(mockError)
+
+	box, err := boxService.Update(boxID, name, &description)
+
+	assert.Error(t, err)
+	assert.Nil(t, box)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
