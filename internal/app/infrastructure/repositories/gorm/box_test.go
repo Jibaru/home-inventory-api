@@ -442,7 +442,7 @@ func TestBoxRepositoryGetByQueryFiltersErrorBoxRepositoryCanNotGetByQueryFilters
 	result, err := boxRepository.GetByQueryFilters(queryFilter, pageFilter)
 
 	assert.Error(t, err)
-	assert.ErrorIs(t, err, repositories.ErrorBoxRepositoryCanNotGetByQueryFilters)
+	assert.ErrorIs(t, err, repositories.ErrBoxRepositoryCanNotGetByQueryFilters)
 	assert.Nil(t, result)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
@@ -639,6 +639,108 @@ func TestBoxRepositoryDeleteErrorBoxRepositoryCanNotDeleteBox(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.ErrorIs(t, err, repositories.ErrBoxRepositoryCanNotDeleteBox)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryGetByID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+	description := random.String(255, random.Alphanumeric)
+	box := &entities.Box{
+		ID:          boxID,
+		Name:        random.String(100, random.Alphanumeric),
+		Description: &description,
+		RoomID:      uuid.NewString(),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `boxes` WHERE id = ? ORDER BY `boxes`.`id` LIMIT 1")).
+		WithArgs(boxID).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "description", "room_id", "created_at", "updated_at"}).
+			AddRow(box.ID, box.Name, *box.Description, box.RoomID, box.CreatedAt, box.UpdatedAt))
+
+	result, err := boxRepository.GetByID(boxID)
+
+	assert.NoError(t, err)
+	assert.Equal(t, box, result)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryGetByIDErrorBoxRepositoryCanNotGetByID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `boxes` WHERE id = ? ORDER BY `boxes`.`id` LIMIT 1")).
+		WithArgs(boxID).
+		WillReturnError(errors.New("record not found"))
+
+	result, err := boxRepository.GetByID(boxID)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrBoxRepositoryCanNotGetByID)
+	assert.Nil(t, result)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryUpdate(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	description := random.String(255, random.Alphanumeric)
+	box := &entities.Box{
+		ID:          uuid.NewString(),
+		Name:        random.String(100, random.Alphanumeric),
+		Description: &description,
+		RoomID:      uuid.NewString(),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("UPDATE `boxes` SET `name`=?,`description`=?,`room_id`=?,`created_at`=?,`updated_at`=? WHERE `id` = ?")).
+		WithArgs(box.Name, *box.Description, box.RoomID, box.CreatedAt, sqlmock.AnyArg(), box.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	dbMock.ExpectCommit()
+
+	err := boxRepository.Update(box)
+
+	assert.NoError(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryUpdateErrorBoxRepositoryCanNotUpdate(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	description := random.String(255, random.Alphanumeric)
+	box := &entities.Box{
+		ID:          uuid.NewString(),
+		Name:        random.String(100, random.Alphanumeric),
+		Description: &description,
+		RoomID:      uuid.NewString(),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("UPDATE `boxes` SET `name`=?,`description`=?,`room_id`=?,`created_at`=?,`updated_at`=? WHERE `id` = ?")).
+		WithArgs(box.Name, *box.Description, box.RoomID, box.CreatedAt, sqlmock.AnyArg(), box.ID).
+		WillReturnError(errors.New("database error"))
+	dbMock.ExpectRollback()
+
+	err := boxRepository.Update(box)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrBoxRepositoryCanNotUpdate)
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
