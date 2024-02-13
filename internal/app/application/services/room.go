@@ -145,3 +145,24 @@ func (s *RoomService) Delete(roomID string) error {
 
 	return nil
 }
+
+func (s *RoomService) Update(
+	roomID string,
+	name string,
+	description *string,
+) (*entities.Room, error) {
+	room, err := s.roomRepository.GetByID(roomID)
+	if err != nil {
+		return nil, err
+	}
+
+	room.Name = name
+	room.Description = description
+
+	err = s.roomRepository.Update(room)
+	if err != nil {
+		return nil, err
+	}
+
+	return room, nil
+}
