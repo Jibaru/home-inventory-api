@@ -5,6 +5,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 	"github.com/jibaru/home-inventory-api/m/logger"
+	"github.com/jibaru/home-inventory-api/m/notifier"
 	"gorm.io/gorm"
 )
 
@@ -21,6 +22,7 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 func (r *UserRepository) Create(user *entities.User) error {
 	if err := r.db.Create(user).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrUserRepositoryCanNotCreateUser
 	}
 

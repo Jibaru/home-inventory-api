@@ -4,6 +4,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 	"github.com/jibaru/home-inventory-api/m/logger"
+	"github.com/jibaru/home-inventory-api/m/notifier"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +21,7 @@ func NewAssetRepository(db *gorm.DB) *AssetRepository {
 func (r *AssetRepository) Create(asset *entities.Asset) error {
 	if err := r.db.Create(asset).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrAssetRepositoryCanNotCreateAsset
 	}
 
@@ -43,6 +45,7 @@ func (r *AssetRepository) FindByEntity(
 
 	if err := result.Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return nil, repositories.ErrAssetRepositoryCanNotGetAssets
 	}
 
@@ -52,6 +55,7 @@ func (r *AssetRepository) FindByEntity(
 func (r *AssetRepository) Delete(id string) error {
 	if err := r.db.Delete(&entities.Asset{}, "id = ?", id).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrAssetRepositoryCanNotDeleteAsset
 	}
 
@@ -64,6 +68,7 @@ func (r *AssetRepository) GetByQueryFilters(queryFilter repositories.QueryFilter
 
 	if err := result.Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return nil, repositories.ErrorAssetRepositoryCanNotGetByQueryFilters
 	}
 

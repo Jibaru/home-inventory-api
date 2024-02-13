@@ -4,6 +4,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 	"github.com/jibaru/home-inventory-api/m/logger"
+	"github.com/jibaru/home-inventory-api/m/notifier"
 	"gorm.io/gorm"
 )
 
@@ -17,6 +18,8 @@ func NewBoxRepository(db *gorm.DB) *BoxRepository {
 
 func (r *BoxRepository) Create(box *entities.Box) error {
 	if err := r.db.Create(box).Error; err != nil {
+		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrBoxRepositoryCanNotCreateBox
 	}
 
@@ -37,6 +40,7 @@ func (r *BoxRepository) GetBoxItem(boxID string, itemID string) (*entities.BoxIt
 func (r *BoxRepository) CreateBoxItem(boxItem *entities.BoxItem) error {
 	if err := r.db.Create(boxItem).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrBoxRepositoryCanBotCreateBoxItem
 	}
 
@@ -46,6 +50,7 @@ func (r *BoxRepository) CreateBoxItem(boxItem *entities.BoxItem) error {
 func (r *BoxRepository) UpdateBoxItem(boxItem *entities.BoxItem) error {
 	if err := r.db.Save(boxItem).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrBoxRepositoryCanNotUpdateBoxItem
 	}
 
@@ -55,6 +60,7 @@ func (r *BoxRepository) UpdateBoxItem(boxItem *entities.BoxItem) error {
 func (r *BoxRepository) CreateBoxTransaction(boxTransaction *entities.BoxTransaction) error {
 	if err := r.db.Create(boxTransaction).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrBoxRepositoryCanNotCreateBoxTransaction
 	}
 
@@ -64,6 +70,7 @@ func (r *BoxRepository) CreateBoxTransaction(boxTransaction *entities.BoxTransac
 func (r *BoxRepository) DeleteBoxItem(boxID string, itemID string) error {
 	if err := r.db.Where("box_id = ? AND item_id = ?", boxID, itemID).Delete(&entities.BoxItem{}).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrBoxRepositoryCanNotDeleteBoxItem
 	}
 
@@ -105,6 +112,7 @@ func (r *BoxRepository) CountByQueryFilters(queryFilter repositories.QueryFilter
 func (r *BoxRepository) DeleteBoxItemsByBoxID(boxID string) error {
 	if err := r.db.Where("box_id = ?", boxID).Delete(&entities.BoxItem{}).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrBoxRepositoryCanNotDeleteBoxItemsByBoxID
 	}
 
@@ -114,6 +122,7 @@ func (r *BoxRepository) DeleteBoxItemsByBoxID(boxID string) error {
 func (r *BoxRepository) DeleteBoxTransactionsByBoxID(boxID string) error {
 	if err := r.db.Where("box_id = ?", boxID).Delete(&entities.BoxTransaction{}).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrBoxRepositoryCanNotDeleteBoxTransactionsByBoxID
 	}
 
@@ -123,6 +132,7 @@ func (r *BoxRepository) DeleteBoxTransactionsByBoxID(boxID string) error {
 func (r *BoxRepository) Delete(id string) error {
 	if err := r.db.Where("id = ?", id).Delete(&entities.Box{}).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrBoxRepositoryCanNotDeleteBox
 	}
 

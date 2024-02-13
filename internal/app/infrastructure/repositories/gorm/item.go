@@ -4,6 +4,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 	"github.com/jibaru/home-inventory-api/m/logger"
+	"github.com/jibaru/home-inventory-api/m/notifier"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +21,7 @@ func NewItemRepository(db *gorm.DB) *ItemRepository {
 func (r *ItemRepository) Create(item *entities.Item) error {
 	if err := r.db.Create(item).Error; err != nil {
 		logger.LogError(err)
+		notifier.NotifyError(err)
 		return repositories.ErrItemRepositoryCanNotCreateItem
 	}
 
