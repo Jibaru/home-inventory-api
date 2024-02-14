@@ -31,34 +31,72 @@ type Room struct {
 }
 
 func NewRoom(name string, description *string, userID string) (*Room, error) {
+	room := &Room{
+		ID:        uuid.NewString(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	err := room.Update(name, description)
+	if err != nil {
+		return nil, err
+	}
+
+	err = room.ChangeUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return room, nil
+}
+
+func (r *Room) Update(name string, description *string) error {
+	err := r.ChangeName(name)
+	if err != nil {
+		return err
+	}
+
+	err = r.ChangeDescription(description)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Room) ChangeUserID(userID string) error {
+	if strings.TrimSpace(userID) == "" {
+		return ErrRoomUserIDShouldNotBeEmpty
+	}
+
+	r.UserID = userID
+	return nil
+}
+
+func (r *Room) ChangeName(name string) error {
 	if strings.TrimSpace(name) == "" {
-		return nil, ErrRoomNameShouldNotBeEmpty
+		return ErrRoomNameShouldNotBeEmpty
 	}
 
 	if len(name) > 100 {
-		return nil, ErrRoomNameShouldHave100OrLessChars
+		return ErrRoomNameShouldHave100OrLessChars
 	}
 
+	r.Name = name
+	return nil
+}
+
+func (r *Room) ChangeDescription(description *string) error {
 	if description != nil {
 		if strings.TrimSpace(*description) == "" {
-			return nil, ErrRoomDescriptionShouldNotBeEmpty
+			return ErrRoomDescriptionShouldNotBeEmpty
 		}
 
 		if len(*description) > 255 {
-			return nil, ErrRoomDescriptionShouldHave255OrLessChars
+			return ErrRoomDescriptionShouldHave255OrLessChars
 		}
 	}
 
-	if strings.TrimSpace(userID) == "" {
-		return nil, ErrRoomUserIDShouldNotBeEmpty
-	}
-
-	return &Room{
-		ID:          uuid.NewString(),
-		Name:        name,
-		Description: description,
-		UserID:      userID,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}, nil
+	r.Description = description
+	return nil
 }
