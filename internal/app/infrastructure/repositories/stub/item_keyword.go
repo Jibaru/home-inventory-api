@@ -13,3 +13,8 @@ func (r *ItemKeywordRepositoryMock) CreateMany(itemKeywords []*entities.ItemKeyw
 	args := r.Called(itemKeywords)
 	return args.Error(0)
 }
+
+func (r *ItemKeywordRepositoryMock) DeleteByItemID(itemID string) error {
+	args := r.Called(itemID)
+	return args.Error(0)
+}
