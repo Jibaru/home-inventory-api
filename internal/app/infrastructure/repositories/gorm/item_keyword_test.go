@@ -103,3 +103,42 @@ func TestItemKeywordRepositoryCreateManyErrorCanNotCreateItemKeywords(t *testing
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestItemKeywordRepositoryDeleteByItemID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	itemKeywordRepository := NewItemKeywordRepository(db)
+
+	itemID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `item_keywords` WHERE item_id = ?")).
+		WithArgs(itemID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	dbMock.ExpectCommit()
+
+	err := itemKeywordRepository.DeleteByItemID(itemID)
+
+	assert.NoError(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestItemKeywordRepositoryDeleteByItemIDErrorCanNotDeleteByItemID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	itemKeywordRepository := NewItemKeywordRepository(db)
+
+	itemID := uuid.NewString()
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("DELETE FROM `item_keywords` WHERE item_id = ?")).
+		WithArgs(itemID).
+		WillReturnError(errors.New("database error"))
+	dbMock.ExpectRollback()
+
+	err := itemKeywordRepository.DeleteByItemID(itemID)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrItemKeywordRepositoryCanNotDeleteByItemID)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}

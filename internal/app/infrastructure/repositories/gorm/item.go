@@ -72,3 +72,13 @@ func (r *ItemRepository) CountByQueryFilters(queryFilter repositories.QueryFilte
 
 	return count, nil
 }
+
+func (r *ItemRepository) Update(item *entities.Item) error {
+	if err := r.db.Save(item).Error; err != nil {
+		logger.LogError(err)
+		notifier.NotifyError(err)
+		return repositories.ErrItemRepositoryCanNotUpdateItem
+	}
+
+	return nil
+}

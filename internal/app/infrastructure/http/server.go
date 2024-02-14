@@ -60,6 +60,7 @@ func RunServer(
 	deleteRoomController := controllers.NewDeleteRoomController(roomService)
 	updateRoomController := controllers.NewUpdateRoomController(roomService)
 	updateBoxController := controllers.NewUpdateBoxController(boxService)
+	updateItemController := controllers.NewUpdateItemController(itemService)
 
 	loggerMiddleware := middlewares.NewLoggerMiddleware()
 	needsAuthMiddleware := middlewares.NewNeedsAuthMiddleware(authService)
@@ -87,6 +88,7 @@ func RunServer(
 	authApi.DELETE("/rooms/:roomID", deleteRoomController.Handle)
 	authApi.PATCH("/rooms/:roomID", updateRoomController.Handle)
 	authApi.PATCH("/boxes/:boxID", updateBoxController.Handle)
+	authApi.PATCH("/items/:itemID", updateItemController.Handle)
 
 	logger.LogError(e.Start(host + ":" + port))
 }

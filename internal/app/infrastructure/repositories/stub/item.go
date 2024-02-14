@@ -44,3 +44,8 @@ func (r *ItemRepositoryMock) CountByQueryFilters(
 	args := r.Called(queryFilter)
 	return args.Get(0).(int64), args.Error(1)
 }
+
+func (r *ItemRepositoryMock) Update(item *entities.Item) error {
+	args := r.Called(item)
+	return args.Error(0)
+}

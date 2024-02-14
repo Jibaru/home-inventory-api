@@ -416,3 +416,244 @@ func TestItemServiceCountAllErrorOnItemRepository(t *testing.T) {
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
 }
+
+func TestItemServiceUpdate(t *testing.T) {
+	itemRepository := &stub.ItemRepositoryMock{}
+	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
+	assetService := &AssetServiceMock{}
+
+	itemService := NewItemService(
+		itemRepository,
+		itemKeywordRepository,
+		assetService,
+	)
+
+	id := uuid.NewString()
+	name := random.String(10, random.Alphanumeric)
+	sku := random.String(10, random.Alphanumeric)
+	description := random.String(100, random.Alphanumeric)
+	unit := "unit"
+	keywords := []string{
+		random.String(10, random.Alphanumeric),
+		random.String(10, random.Alphanumeric),
+	}
+	file := &os.File{}
+
+	itemRepository.On("GetByID", id).
+		Return(&entities.Item{
+			ID:          id,
+			Sku:         random.String(10, random.Alphanumeric),
+			Name:        random.String(10, random.Alphanumeric),
+			Description: nil,
+			Unit:        "unit",
+			UserID:      uuid.NewString(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}, nil)
+	itemRepository.On("Update", mock.AnythingOfType("*entities.Item")).
+		Return(nil)
+	itemKeywordRepository.On("DeleteByItemID", id).
+		Return(nil)
+	itemKeywordRepository.On("CreateMany", mock.AnythingOfType("[]*entities.ItemKeyword")).
+		Return(nil)
+	assetService.On("UpdateByEntity", mock.AnythingOfType("*entities.Item"), file).
+		Return(&entities.Asset{
+			ID:         uuid.NewString(),
+			Name:       random.String(10, random.Alphanumeric),
+			Extension:  ".png",
+			Size:       12314,
+			FileID:     uuid.NewString(),
+			EntityID:   id,
+			EntityName: "item",
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}, nil)
+
+	item, err := itemService.Update(
+		id,
+		name,
+		sku,
+		&description,
+		unit,
+		keywords,
+		file,
+	)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, item)
+	assert.Equal(t, id, item.ID)
+	assert.Equal(t, sku, item.Sku)
+	assert.Equal(t, name, item.Name)
+	assert.Equal(t, description, *item.Description)
+	assert.Equal(t, unit, item.Unit)
+	itemRepository.AssertExpectations(t)
+	itemKeywordRepository.AssertExpectations(t)
+	assetService.AssertExpectations(t)
+}
+
+func TestItemServiceUpdateErrorOnItemRepository(t *testing.T) {
+	itemRepository := &stub.ItemRepositoryMock{}
+	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
+	assetService := &AssetServiceMock{}
+
+	itemService := NewItemService(
+		itemRepository,
+		itemKeywordRepository,
+		assetService,
+	)
+
+	id := uuid.NewString()
+	name := random.String(10, random.Alphanumeric)
+	sku := random.String(10, random.Alphanumeric)
+	description := random.String(100, random.Alphanumeric)
+	unit := "unit"
+	keywords := []string{
+		random.String(10, random.Alphanumeric),
+		random.String(10, random.Alphanumeric),
+	}
+	file := &os.File{}
+
+	itemRepository.On("GetByID", id).
+		Return(&entities.Item{
+			ID:          id,
+			Sku:         random.String(10, random.Alphanumeric),
+			Name:        random.String(10, random.Alphanumeric),
+			Description: nil,
+			Unit:        "unit",
+			UserID:      uuid.NewString(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}, nil)
+	itemRepository.On("Update", mock.AnythingOfType("*entities.Item")).
+		Return(errors.New("item repository error"))
+
+	item, err := itemService.Update(
+		id,
+		name,
+		sku,
+		&description,
+		unit,
+		keywords,
+		file,
+	)
+
+	assert.Error(t, err)
+	assert.Nil(t, item)
+	itemRepository.AssertExpectations(t)
+	itemKeywordRepository.AssertExpectations(t)
+	assetService.AssertExpectations(t)
+}
+
+func TestItemServiceUpdateErrorOnItemKeywordRepository(t *testing.T) {
+	itemRepository := &stub.ItemRepositoryMock{}
+	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
+	assetService := &AssetServiceMock{}
+
+	itemService := NewItemService(
+		itemRepository,
+		itemKeywordRepository,
+		assetService,
+	)
+
+	id := uuid.NewString()
+	name := random.String(10, random.Alphanumeric)
+	sku := random.String(10, random.Alphanumeric)
+	description := random.String(100, random.Alphanumeric)
+	unit := "unit"
+	keywords := []string{
+		random.String(10, random.Alphanumeric),
+		random.String(10, random.Alphanumeric),
+	}
+	file := &os.File{}
+
+	itemRepository.On("GetByID", id).
+		Return(&entities.Item{
+			ID:          id,
+			Sku:         random.String(10, random.Alphanumeric),
+			Name:        random.String(10, random.Alphanumeric),
+			Description: nil,
+			Unit:        "unit",
+			UserID:      uuid.NewString(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}, nil)
+	itemRepository.On("Update", mock.AnythingOfType("*entities.Item")).
+		Return(nil)
+	itemKeywordRepository.On("DeleteByItemID", id).
+		Return(errors.New("item keyword repository error"))
+
+	item, err := itemService.Update(
+		id,
+		name,
+		sku,
+		&description,
+		unit,
+		keywords,
+		file,
+	)
+
+	assert.Error(t, err)
+	assert.Nil(t, item)
+	itemRepository.AssertExpectations(t)
+	itemKeywordRepository.AssertExpectations(t)
+	assetService.AssertExpectations(t)
+}
+
+func TestItemServiceUpdateErrorOnAssetService(t *testing.T) {
+	itemRepository := &stub.ItemRepositoryMock{}
+	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
+	assetService := &AssetServiceMock{}
+
+	itemService := NewItemService(
+		itemRepository,
+		itemKeywordRepository,
+		assetService,
+	)
+
+	id := uuid.NewString()
+	name := random.String(10, random.Alphanumeric)
+	sku := random.String(10, random.Alphanumeric)
+	description := random.String(100, random.Alphanumeric)
+	unit := "unit"
+	keywords := []string{
+		random.String(10, random.Alphanumeric),
+		random.String(10, random.Alphanumeric),
+	}
+	file := &os.File{}
+
+	itemRepository.On("GetByID", id).
+		Return(&entities.Item{
+			ID:          id,
+			Sku:         random.String(10, random.Alphanumeric),
+			Name:        random.String(10, random.Alphanumeric),
+			Description: nil,
+			Unit:        "unit",
+			UserID:      uuid.NewString(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}, nil)
+	itemRepository.On("Update", mock.AnythingOfType("*entities.Item")).
+		Return(nil)
+	itemKeywordRepository.On("DeleteByItemID", id).
+		Return(nil)
+	itemKeywordRepository.On("CreateMany", mock.AnythingOfType("[]*entities.ItemKeyword")).
+		Return(nil)
+	assetService.On("UpdateByEntity", mock.AnythingOfType("*entities.Item"), file).
+		Return(nil, errors.New("asset service error"))
+
+	item, err := itemService.Update(
+		id,
+		name,
+		sku,
+		&description,
+		unit,
+		keywords,
+		file,
+	)
+
+	assert.Error(t, err)
+	assert.Nil(t, item)
+	itemRepository.AssertExpectations(t)
+	itemKeywordRepository.AssertExpectations(t)
+	assetService.AssertExpectations(t)
+}

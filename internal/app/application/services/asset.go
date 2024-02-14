@@ -14,6 +14,7 @@ type AssetServiceInterface interface {
 	GetByEntity(entity entities.Entity, pageFilter *PageFilter) ([]*entities.Asset, error)
 	Delete(asset *entities.Asset) error
 	GetByEntities(entities []entities.Entity) ([]*entities.Asset, error)
+	UpdateByEntity(entity entities.Entity, file *os.File) (*entities.Asset, error)
 }
 
 type AssetService struct {
@@ -128,6 +129,27 @@ func (s *AssetService) GetByEntities(theEntities []entities.Entity) ([]*entities
 	return assets, nil
 }
 
+func (s *AssetService) UpdateByEntity(theEntity entities.Entity, file *os.File) (*entities.Asset, error) {
+	oldAssets, err := s.assetRepository.FindByEntity(theEntity, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, oldAsset := range oldAssets {
+		err = s.Delete(oldAsset)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	asset, err := s.CreateFromFile(file, theEntity)
+	if err != nil {
+		return nil, err
+	}
+
+	return asset, nil
+}
+
 type AssetServiceMock struct {
 	mock.Mock
 }
@@ -172,4 +194,17 @@ func (s *AssetServiceMock) GetByEntities(
 	}
 
 	return args.Get(0).([]*entities.Asset), args.Error(1)
+}
+
+func (s *AssetServiceMock) UpdateByEntity(
+	theEntity entities.Entity,
+	file *os.File,
+) (*entities.Asset, error) {
+	args := s.Called(theEntity, file)
+
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
+	return args.Get(0).(*entities.Asset), args.Error(1)
 }

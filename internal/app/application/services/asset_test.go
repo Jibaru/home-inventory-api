@@ -296,3 +296,42 @@ func TestAssetServiceGetByEntitiesErrorFromAssetRepository(t *testing.T) {
 	assert.Nil(t, assets)
 	assetRepository.AssertExpectations(t)
 }
+
+func TestAssetServiceUpdateByEntity(t *testing.T) {
+	assetRepository := &stub.AssetRepositoryMock{}
+	fileManager := &serviceStubs.FileManagerMock{}
+	service := NewAssetService(fileManager, assetRepository)
+
+	entity := entities.NewIdentifiableEntity(uuid.NewString())
+	oldAssetId := uuid.NewString()
+	oldFileID := uuid.NewString()
+	oldExtension := ".png"
+	var filter *repositories.PageFilter
+
+	file, err := os.CreateTemp("", "*_"+uuid.NewString())
+	defer file.Close()
+
+	assetRepository.On("FindByEntity", entity, filter).
+		Return([]*entities.Asset{
+			{
+				ID:        oldAssetId,
+				FileID:    oldFileID,
+				Extension: oldExtension,
+			},
+		}, nil)
+	assetRepository.On("Delete", oldAssetId).
+		Return(nil)
+	assetRepository.On("Create", mock.AnythingOfType("*entities.Asset")).
+		Return(nil)
+	fileManager.On("Upload", file).
+		Return(uuid.NewString(), nil)
+	fileManager.On("Delete", oldFileID, oldExtension).
+		Return(nil)
+
+	asset, err := service.UpdateByEntity(entity, file)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, asset)
+	assetRepository.AssertExpectations(t)
+	fileManager.AssertExpectations(t)
+}

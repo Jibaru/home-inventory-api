@@ -380,3 +380,59 @@ func TestItemRepositoryCountByQueryFiltersErrorCanNotCountByQueryFilters(t *test
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestItemRepositoryUpdate(t *testing.T) {
+	db, dbMock := makeDBMock()
+	itemRepository := NewItemRepository(db)
+
+	item := &entities.Item{
+		ID:          uuid.NewString(),
+		Sku:         random.String(20, random.Alphanumeric),
+		Name:        random.String(100, random.Alphanumeric),
+		Description: nil,
+		Unit:        "unit",
+		UserID:      uuid.NewString(),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("UPDATE `items` SET `sku`=?,`name`=?,`description`=?,`unit`=?,`user_id`=?,`created_at`=?,`updated_at`=? WHERE `id` = ?")).
+		WithArgs(item.Sku, item.Name, item.Description, item.Unit, item.UserID, item.CreatedAt, sqlmock.AnyArg(), item.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	dbMock.ExpectCommit()
+
+	err := itemRepository.Update(item)
+
+	assert.NoError(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestItemRepositoryUpdateErrorCanNotUpdateItem(t *testing.T) {
+	db, dbMock := makeDBMock()
+	itemRepository := NewItemRepository(db)
+
+	item := &entities.Item{
+		ID:          uuid.NewString(),
+		Sku:         random.String(20, random.Alphanumeric),
+		Name:        random.String(100, random.Alphanumeric),
+		Description: nil,
+		Unit:        "unit",
+		UserID:      uuid.NewString(),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	dbMock.ExpectBegin()
+	dbMock.ExpectExec(regexp.QuoteMeta("UPDATE `items` SET `sku`=?,`name`=?,`description`=?,`unit`=?,`user_id`=?,`created_at`=?,`updated_at`=? WHERE `id` = ?")).
+		WithArgs(item.Sku, item.Name, item.Description, item.Unit, item.UserID, item.CreatedAt, sqlmock.AnyArg(), item.ID).
+		WillReturnError(errors.New("database error"))
+	dbMock.ExpectRollback()
+
+	err := itemRepository.Update(item)
+
+	assert.Error(t, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
