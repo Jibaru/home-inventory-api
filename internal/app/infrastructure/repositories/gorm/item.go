@@ -42,10 +42,11 @@ func (r *ItemRepository) GetByID(id string) (*entities.Item, error) {
 func (r *ItemRepository) GetByQueryFilters(queryFilter repositories.QueryFilter, pageFilter *repositories.PageFilter) ([]*entities.Item, error) {
 	var items []*entities.Item
 	err := applyFilters(r.db, queryFilter).
-		Joins("inner join item_keywords on item_keywords.item_id = items.id").
+		Joins("left join item_keywords on item_keywords.item_id = items.id").
 		Offset(pageFilter.Offset).
 		Limit(pageFilter.Limit).
 		Preload("Keywords").
+		Group("items.id").
 		Find(&items).
 		Error
 
@@ -60,8 +61,9 @@ func (r *ItemRepository) GetByQueryFilters(queryFilter repositories.QueryFilter,
 func (r *ItemRepository) CountByQueryFilters(queryFilter repositories.QueryFilter) (int64, error) {
 	var count int64
 	err := applyFilters(r.db, queryFilter).
-		Joins("inner join item_keywords on item_keywords.item_id = items.id").
+		Joins("left join item_keywords on item_keywords.item_id = items.id").
 		Model(&entities.Item{}).
+		Select("count(distinct items.id)").
 		Count(&count).
 		Error
 
