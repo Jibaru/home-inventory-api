@@ -190,3 +190,61 @@ func (s *ItemService) makeGetAllQueryFilter(
 
 	return queryFilter
 }
+
+func (s *ItemService) Update(
+	id string,
+	name string,
+	sku string,
+	description *string,
+	unit string,
+	keywords []string,
+	imageFile *os.File,
+) (*entities.Item, error) {
+	item, err := s.itemRepository.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = item.Update(sku, name, description, unit)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.itemRepository.Update(item)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.itemKeywordRepository.DeleteByItemID(item.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(keywords) > 0 {
+		var itemKeywords []*entities.ItemKeyword
+		for _, keyword := range keywords {
+			itemKeyword, err := entities.NewItemKeyword(item.ID, keyword)
+			if err != nil {
+				return nil, err
+			}
+
+			itemKeywords = append(itemKeywords, itemKeyword)
+		}
+
+		err = s.itemKeywordRepository.CreateMany(itemKeywords)
+		if err != nil {
+			return nil, err
+		}
+
+		item.Keywords = itemKeywords
+	}
+
+	if imageFile != nil {
+		_, err = s.assetService.UpdateByEntity(item, imageFile)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return item, nil
+}
