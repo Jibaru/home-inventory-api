@@ -85,3 +85,78 @@ func TestNewRoomErrorUserIDShouldNotBeEmpty(t *testing.T) {
 	assert.Nil(t, room)
 	assert.ErrorIs(t, err, ErrRoomUserIDShouldNotBeEmpty)
 }
+
+func TestRoomUpdate(t *testing.T) {
+	description := random.String(100, random.Alphanumeric)
+	room := &Room{
+		ID:          uuid.NewString(),
+		Name:        random.String(100, random.Alphanumeric),
+		Description: &description,
+	}
+
+	name := random.String(100, random.Alphanumeric)
+	description = random.String(100, random.Alphanumeric)
+
+	err := room.Update(name, &description)
+
+	assert.NoError(t, err)
+	assert.Equal(t, name, room.Name)
+	assert.Equal(t, description, *room.Description)
+}
+
+func TestRoomUpdateErrorNameShouldNotBeEmpty(t *testing.T) {
+	description := random.String(100, random.Alphanumeric)
+	room := &Room{
+		ID:          uuid.NewString(),
+		Name:        random.String(100, random.Alphanumeric),
+		Description: &description,
+	}
+
+	name := ""
+	description = random.String(100, random.Alphanumeric)
+
+	err := room.Update(name, &description)
+
+	assert.Error(t, err)
+	assert.Equal(t, room.Name, room.Name)
+	assert.Equal(t, *room.Description, *room.Description)
+	assert.ErrorIs(t, err, ErrRoomNameShouldNotBeEmpty)
+}
+
+func TestRoomUpdateErrorNameShouldHave100OrLessChars(t *testing.T) {
+	description := random.String(100, random.Alphanumeric)
+	room := &Room{
+		ID:          uuid.NewString(),
+		Name:        random.String(20, random.Alphanumeric),
+		Description: &description,
+	}
+
+	name := random.String(101, random.Alphanumeric)
+	description = random.String(100, random.Alphanumeric)
+
+	err := room.Update(name, &description)
+
+	assert.Error(t, err)
+	assert.Equal(t, room.Name, room.Name)
+	assert.Equal(t, *room.Description, *room.Description)
+	assert.ErrorIs(t, err, ErrRoomNameShouldHave100OrLessChars)
+}
+
+func TestRoomUpdateErrorDescriptionShouldHave255OrLessChars(t *testing.T) {
+	description := random.String(100, random.Alphanumeric)
+	room := &Room{
+		ID:          uuid.NewString(),
+		Name:        random.String(40, random.Alphanumeric),
+		Description: &description,
+	}
+
+	name := random.String(100, random.Alphanumeric)
+	description = random.String(255, random.Alphanumeric) + "1"
+
+	err := room.Update(name, &description)
+
+	assert.Error(t, err)
+	assert.Equal(t, room.Name, room.Name)
+	assert.Equal(t, *room.Description, *room.Description)
+	assert.ErrorIs(t, err, ErrRoomDescriptionShouldHave255OrLessChars)
+}
