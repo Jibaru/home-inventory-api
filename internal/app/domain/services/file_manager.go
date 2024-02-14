@@ -7,6 +7,7 @@ import (
 
 var (
 	ErrFileManagerCanNotDeleteFile = errors.New("can not delete file")
+	ErrFileManagerCanNotSeekFile   = errors.New("can not seek file")
 	ErrFileManagerCanNotUploadFile = errors.New("can not upload file")
 	ErrFileManagerUploadingFile    = errors.New("error uploading file")
 )
