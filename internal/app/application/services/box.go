@@ -364,8 +364,10 @@ func (s *BoxService) Update(
 		return nil, err
 	}
 
-	box.Name = name
-	box.Description = description
+	err = box.Update(name, description)
+	if err != nil {
+		return nil, err
+	}
 
 	err = s.boxRepository.Update(box)
 	if err != nil {

@@ -29,34 +29,75 @@ func NewBox(
 	description *string,
 	roomID string,
 ) (*Box, error) {
+	box := &Box{
+		ID:        uuid.NewString(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	err := box.Update(name, description)
+	if err != nil {
+		return nil, err
+	}
+
+	err = box.ChangeRoomID(roomID)
+	if err != nil {
+		return nil, err
+	}
+
+	return box, nil
+}
+
+func (b *Box) ChangeName(name string) error {
 	if strings.TrimSpace(name) == "" {
-		return nil, ErrBoxNameShouldNotBeEmpty
+		return ErrBoxNameShouldNotBeEmpty
 	}
 
 	if len(name) > 100 {
-		return nil, ErrBoxNameShouldHave100OrLessChars
+		return ErrBoxNameShouldHave100OrLessChars
 	}
 
+	b.Name = name
+	return nil
+}
+
+func (b *Box) ChangeDescription(description *string) error {
 	if description != nil {
 		if strings.TrimSpace(*description) == "" {
-			return nil, ErrBoxDescriptionShouldNotBeEmpty
+			return ErrBoxDescriptionShouldNotBeEmpty
 		}
 
 		if len(*description) > 255 {
-			return nil, ErrBoxDescriptionShouldHave255OrLessChars
+			return ErrBoxDescriptionShouldHave255OrLessChars
 		}
 	}
 
+	b.Description = description
+	return nil
+}
+
+func (b *Box) ChangeRoomID(roomID string) error {
 	if strings.TrimSpace(roomID) == "" {
-		return nil, ErrBoxRoomIDShouldNotBeEmpty
+		return ErrBoxRoomIDShouldNotBeEmpty
 	}
 
-	return &Box{
-		ID:          uuid.NewString(),
-		Name:        name,
-		Description: description,
-		RoomID:      roomID,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}, nil
+	b.RoomID = roomID
+	return nil
+}
+
+func (b *Box) Update(
+	name string,
+	description *string,
+) error {
+	err := b.ChangeName(name)
+	if err != nil {
+		return err
+	}
+
+	err = b.ChangeDescription(description)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
