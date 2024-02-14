@@ -69,6 +69,11 @@ func (m *FileManager) getNewS3Client() (*s3.S3, error) {
 }
 
 func (m *FileManager) Upload(file *os.File) (string, error) {
+	_, err := file.Seek(0, 0)
+	if err != nil {
+		return "", services.ErrFileManagerCanNotSeekFile
+	}
+
 	uploader, err := m.getUploader()
 	if err != nil {
 		return "", services.ErrFileManagerCanNotUploadFile
