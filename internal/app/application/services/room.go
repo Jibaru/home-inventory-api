@@ -156,8 +156,10 @@ func (s *RoomService) Update(
 		return nil, err
 	}
 
-	room.Name = name
-	room.Description = description
+	err = room.Update(name, description)
+	if err != nil {
+		return nil, err
+	}
 
 	err = s.roomRepository.Update(room)
 	if err != nil {
