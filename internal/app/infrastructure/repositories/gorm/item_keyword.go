@@ -27,3 +27,13 @@ func (r *ItemKeywordRepository) CreateMany(itemKeywords []*entities.ItemKeyword)
 
 	return nil
 }
+
+func (r *ItemKeywordRepository) DeleteByItemID(itemID string) error {
+	if err := r.db.Where("item_id = ?", itemID).Delete(&entities.ItemKeyword{}).Error; err != nil {
+		logger.LogError(err)
+		notifier.NotifyError(err)
+		return repositories.ErrItemKeywordRepositoryCanNotDeleteByItemID
+	}
+
+	return nil
+}
