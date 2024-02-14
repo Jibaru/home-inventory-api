@@ -51,50 +51,48 @@ type Item struct {
 }
 
 func NewItem(sku, name string, description *string, unit string, userID string) (*Item, error) {
-	if strings.TrimSpace(sku) == "" {
-		return nil, ErrItemSkuShouldNotBeEmpty
+	item := &Item{
+		ID:        uuid.NewString(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
-	if len(sku) > 100 {
-		return nil, ErrItemSkuShouldHaveLessThan100Characters
+	err := item.Update(sku, name, description, unit)
+	if err != nil {
+		return nil, err
 	}
 
-	if strings.TrimSpace(name) == "" {
-		return nil, ErrItemNameShouldNotBeEmpty
+	err = item.ChangeUserID(userID)
+	if err != nil {
+		return nil, err
 	}
 
-	if len(name) > 255 {
-		return nil, ErrItemNameShouldHaveLessThan255Characters
+	return item, nil
+}
+
+func (i *Item) Update(sku, name string, description *string, unit string) error {
+	err := i.ChangeSku(sku)
+	if err != nil {
+		return err
 	}
 
-	if description != nil {
-		if strings.TrimSpace(*description) == "" {
-			return nil, ErrItemDescriptionShouldNotBeEmpty
-		}
-
-		if len(*description) > 65535 {
-			return nil, ErrItemDescriptionShouldHaveLessThan65535Characters
-		}
+	err = i.ChangeName(name)
+	if err != nil {
+		return err
 	}
 
-	if strings.TrimSpace(userID) == "" {
-		return nil, ErrItemUserIDShouldNotBeEmpty
+	err = i.ChangeDescription(description)
+	if err != nil {
+		return err
 	}
 
-	if _, ok := ValidItemUnits[unit]; !ok {
-		return nil, ErrItemUnitShouldBeValid
+	err = i.ChangeUnit(unit)
+	if err != nil {
+		return err
 	}
 
-	return &Item{
-		ID:          uuid.NewString(),
-		Sku:         sku,
-		Name:        name,
-		Description: description,
-		Unit:        unit,
-		UserID:      userID,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}, nil
+	i.UpdatedAt = time.Now()
+	return nil
 }
 
 func (i *Item) EntityID() string {
@@ -103,4 +101,63 @@ func (i *Item) EntityID() string {
 
 func (i *Item) EntityName() string {
 	return "item"
+}
+
+func (i *Item) ChangeSku(sku string) error {
+	if strings.TrimSpace(sku) == "" {
+		return ErrItemSkuShouldNotBeEmpty
+	}
+
+	if len(sku) > 100 {
+		return ErrItemSkuShouldHaveLessThan100Characters
+	}
+
+	i.Sku = sku
+	return nil
+}
+
+func (i *Item) ChangeName(name string) error {
+	if strings.TrimSpace(name) == "" {
+		return ErrItemNameShouldNotBeEmpty
+	}
+
+	if len(name) > 255 {
+		return ErrItemNameShouldHaveLessThan255Characters
+	}
+
+	i.Name = name
+	return nil
+}
+
+func (i *Item) ChangeDescription(description *string) error {
+	if description != nil {
+		if strings.TrimSpace(*description) == "" {
+			return ErrItemDescriptionShouldNotBeEmpty
+		}
+
+		if len(*description) > 65535 {
+			return ErrItemDescriptionShouldHaveLessThan65535Characters
+		}
+	}
+
+	i.Description = description
+	return nil
+}
+
+func (i *Item) ChangeUnit(unit string) error {
+	if _, ok := ValidItemUnits[unit]; !ok {
+		return ErrItemUnitShouldBeValid
+	}
+
+	i.Unit = unit
+	return nil
+}
+
+func (i *Item) ChangeUserID(userID string) error {
+	if strings.TrimSpace(userID) == "" {
+		return ErrItemUserIDShouldNotBeEmpty
+	}
+
+	i.UserID = userID
+	return nil
 }
