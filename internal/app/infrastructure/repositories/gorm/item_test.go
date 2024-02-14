@@ -188,7 +188,7 @@ func TestItemRepositoryGetByQueryFilters(t *testing.T) {
 	}
 	rows := sqlmock.NewRows([]string{"id", "sku", "name", "description", "unit", "user_id", "created_at", "updated_at"}).
 		AddRow(item.ID, item.Sku, item.Name, item.Description, item.Unit, item.UserID, item.CreatedAt, item.UpdatedAt)
-	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT `items`.`id`,`items`.`sku`,`items`.`name`,`items`.`description`,`items`.`unit`,`items`.`user_id`,`items`.`created_at`,`items`.`updated_at` FROM `items` inner join item_keywords on item_keywords.item_id = items.id WHERE (sku LIKE ? OR name LIKE ? OR description LIKE ?) AND user_id = ? LIMIT 10 OFFSET 1")).
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT `items`.`id`,`items`.`sku`,`items`.`name`,`items`.`description`,`items`.`unit`,`items`.`user_id`,`items`.`created_at`,`items`.`updated_at` FROM `items` left join item_keywords on item_keywords.item_id = items.id WHERE (sku LIKE ? OR name LIKE ? OR description LIKE ?) AND user_id = ? GROUP BY `items`.`id` LIMIT 10 OFFSET 1")).
 		WithArgs("%search%", "%search%", "%search%", item.UserID).
 		WillReturnRows(rows)
 	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `item_keywords` WHERE `item_keywords`.`item_id` = ?")).
@@ -258,7 +258,7 @@ func TestItemRepositoryGetByQueryFiltersErrorCanNotGetByQueryFilters(t *testing.
 		Limit:  10,
 	}
 
-	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT `items`.`id`,`items`.`sku`,`items`.`name`,`items`.`description`,`items`.`unit`,`items`.`user_id`,`items`.`created_at`,`items`.`updated_at` FROM `items` inner join item_keywords on item_keywords.item_id = items.id WHERE (sku LIKE ? OR name LIKE ? OR description LIKE ?) AND user_id = ? LIMIT 10 OFFSET 1")).
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT `items`.`id`,`items`.`sku`,`items`.`name`,`items`.`description`,`items`.`unit`,`items`.`user_id`,`items`.`created_at`,`items`.`updated_at` FROM `items` left join item_keywords on item_keywords.item_id = items.id WHERE (sku LIKE ? OR name LIKE ? OR description LIKE ?) AND user_id = ? GROUP BY `items`.`id` LIMIT 10 OFFSET 1")).
 		WithArgs("%search%", "%search%", "%search%", userID).
 		WillReturnError(errors.New("database error"))
 
@@ -313,9 +313,9 @@ func TestItemRepositoryCountByQueryFilters(t *testing.T) {
 	}
 
 	count := int64(10)
-	rows := sqlmock.NewRows([]string{"count"}).
+	rows := sqlmock.NewRows([]string{"count(distinct items.id)"}).
 		AddRow(count)
-	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `items` inner join item_keywords on item_keywords.item_id = items.id WHERE (sku LIKE ? OR name LIKE ? OR description LIKE ?) AND user_id = ?")).
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(distinct items.id) FROM `items` left join item_keywords on item_keywords.item_id = items.id WHERE (sku LIKE ? OR name LIKE ? OR description LIKE ?) AND user_id = ?")).
 		WithArgs("%search%", "%search%", "%search%", userID).
 		WillReturnRows(rows)
 
@@ -368,7 +368,7 @@ func TestItemRepositoryCountByQueryFiltersErrorCanNotCountByQueryFilters(t *test
 		},
 	}
 
-	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `items` inner join item_keywords on item_keywords.item_id = items.id WHERE (sku LIKE ? OR name LIKE ? OR description LIKE ?) AND user_id = ?")).
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(distinct items.id) FROM `items` left join item_keywords on item_keywords.item_id = items.id WHERE (sku LIKE ? OR name LIKE ? OR description LIKE ?) AND user_id = ?")).
 		WithArgs("%search%", "%search%", "%search%", userID).
 		WillReturnError(errors.New("database error"))
 
