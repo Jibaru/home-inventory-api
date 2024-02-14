@@ -7,8 +7,10 @@ import (
 
 var (
 	ErrItemKeywordRepositoryCanNotCreateItemKeywords = errors.New("can not create item keywords")
+	ErrItemKeywordRepositoryCanNotDeleteByItemID     = errors.New("can not delete by item id")
 )
 
 type ItemKeywordRepository interface {
 	CreateMany(itemKeyword []*entities.ItemKeyword) error
+	DeleteByItemID(itemID string) error
 }
