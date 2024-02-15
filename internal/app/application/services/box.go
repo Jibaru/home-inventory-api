@@ -398,3 +398,55 @@ func (s *BoxService) TransferToRoom(
 
 	return nil
 }
+
+func (s *BoxService) GetBoxTransactions(
+	boxID string,
+	pageFilter PageFilter,
+) ([]*entities.BoxTransaction, error) {
+	queryFilter := s.makeGetBoxTransactionsQueryFilter(boxID)
+
+	boxTransactions, err := s.boxRepository.GetBoxTransactionsByQueryFilters(
+		*queryFilter,
+		&repositories.PageFilter{
+			Offset: (pageFilter.Page - 1) * pageFilter.Size,
+			Limit:  pageFilter.Size,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return boxTransactions, nil
+}
+
+func (s *BoxService) CountBoxTransactions(
+	boxID string,
+) (int64, error) {
+	queryFilter := s.makeGetBoxTransactionsQueryFilter(boxID)
+
+	count, err := s.boxRepository.CountBoxTransactionsByQueryFilters(*queryFilter)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (s *BoxService) makeGetBoxTransactionsQueryFilter(
+	boxID string,
+) *repositories.QueryFilter {
+	return &repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "box_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    boxID,
+					},
+				},
+			},
+		},
+	}
+}
