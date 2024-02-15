@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
-	"log"
+	"github.com/jibaru/home-inventory-api/m/internal/app/domain/services"
 	"time"
 )
 
@@ -17,17 +17,20 @@ type BoxService struct {
 	boxRepository  repositories.BoxRepository
 	itemRepository repositories.ItemRepository
 	roomRepository repositories.RoomRepository
+	eventBus       services.EventBus
 }
 
 func NewBoxService(
 	boxRepository repositories.BoxRepository,
 	itemRepository repositories.ItemRepository,
 	roomRepository repositories.RoomRepository,
+	eventBus services.EventBus,
 ) *BoxService {
 	return &BoxService{
 		boxRepository,
 		itemRepository,
 		roomRepository,
+		eventBus,
 	}
 }
 
@@ -93,22 +96,20 @@ func (s *BoxService) AddItemIntoBox(
 
 	happenedAt := time.Now()
 
-	go func() {
-		_, err := s.createAddBoxTransaction(
-			quantity,
-			boxID,
-			*item,
-			happenedAt,
-		)
-		if err != nil {
-			log.Println(err)
-		}
-	}()
+	err = s.eventBus.Publish(services.BoxItemAddedEvent{
+		Quantity:   quantity,
+		BoxID:      boxID,
+		Item:       *item,
+		HappenedAt: happenedAt,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	return boxItem, nil
 }
 
-func (s *BoxService) createAddBoxTransaction(
+func (s *BoxService) CreateAddBoxTransaction(
 	quantity float64,
 	boxID string,
 	item entities.Item,
@@ -167,22 +168,20 @@ func (s *BoxService) RemoveItemFromBox(
 
 	happenedAt := time.Now()
 
-	go func() {
-		_, err := s.createRemoveBoxTransaction(
-			quantity,
-			boxID,
-			*item,
-			happenedAt,
-		)
-		if err != nil {
-			log.Println(err)
-		}
-	}()
+	err = s.eventBus.Publish(services.BoxItemRemovedEvent{
+		Quantity:   quantity,
+		BoxID:      boxID,
+		Item:       *item,
+		HappenedAt: happenedAt,
+	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (s *BoxService) createRemoveBoxTransaction(
+func (s *BoxService) CreateRemoveBoxTransaction(
 	quantity float64,
 	boxID string,
 	item entities.Item,
