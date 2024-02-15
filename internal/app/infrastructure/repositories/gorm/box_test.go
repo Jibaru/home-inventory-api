@@ -744,3 +744,162 @@ func TestBoxRepositoryUpdateErrorBoxRepositoryCanNotUpdate(t *testing.T) {
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestBoxRepositoryGetBoxTransactionsByQueryFilters(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	queryFilter := repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "box_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    boxID,
+					},
+				},
+			},
+		},
+	}
+	pageFilter := &repositories.PageFilter{
+		Offset: 0,
+		Limit:  10,
+	}
+
+	boxTransactions := []*entities.BoxTransaction{
+		{
+			ID:       uuid.NewString(),
+			Type:     "add",
+			Quantity: 12,
+			BoxID:    boxID,
+			ItemID:   uuid.NewString(),
+			ItemSku:  random.String(4, random.Alphanumeric),
+			ItemName: random.String(10, random.Alphanumeric),
+			ItemUnit: "unit",
+		},
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "type", "quantity", "box_id", "item_id", "item_sku", "item_name", "item_unit", "happened_at", "created_at", "updated_at"})
+	for _, boxTransaction := range boxTransactions {
+		rows.AddRow(boxTransaction.ID, boxTransaction.Type, boxTransaction.Quantity, boxTransaction.BoxID, boxTransaction.ItemID, boxTransaction.ItemSku, boxTransaction.ItemName, boxTransaction.ItemUnit, boxTransaction.HappenedAt, boxTransaction.CreatedAt, boxTransaction.UpdatedAt)
+	}
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `box_transactions` WHERE box_id = ? ORDER BY created_at desc LIMIT 10")).
+		WithArgs(boxID).
+		WillReturnRows(rows)
+
+	transactions, err := boxRepository.GetBoxTransactionsByQueryFilters(queryFilter, pageFilter)
+
+	assert.NoError(t, err)
+	assert.Equal(t, boxTransactions, transactions)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryGetBoxTransactionsByQueryFiltersErrorCanNotGetBoxTransactionsByQueryFilters(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	queryFilter := repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "box_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    boxID,
+					},
+				},
+			},
+		},
+	}
+	pageFilter := &repositories.PageFilter{
+		Offset: 0,
+		Limit:  10,
+	}
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `box_transactions` WHERE box_id = ? ORDER BY created_at desc LIMIT 10")).
+		WithArgs(boxID).
+		WillReturnError(errors.New("database error"))
+
+	transactions, err := boxRepository.GetBoxTransactionsByQueryFilters(queryFilter, pageFilter)
+
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, repositories.ErrBoxRepositoryCanNotGetBoxTransactionsByQueryFilters)
+	assert.Nil(t, transactions)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryCountBoxTransactionsByQueryFilters(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	queryFilter := repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "box_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    boxID,
+					},
+				},
+			},
+		},
+	}
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `box_transactions` WHERE box_id = ?")).
+		WithArgs(boxID).
+		WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(10))
+
+	count, err := boxRepository.CountBoxTransactionsByQueryFilters(queryFilter)
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(10), count)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestBoxRepositoryCountBoxTransactionsByQueryFiltersErrorCanNotCountBoxTransactionsByQueryFilters(t *testing.T) {
+	db, dbMock := makeDBMock()
+	boxRepository := NewBoxRepository(db)
+
+	boxID := uuid.NewString()
+
+	queryFilter := repositories.QueryFilter{
+		ConditionGroups: []repositories.ConditionGroup{
+			{
+				Operator: repositories.AndLogicalOperator,
+				Conditions: []repositories.Condition{
+					{
+						Field:    "box_id",
+						Operator: repositories.EqualComparisonOperator,
+						Value:    boxID,
+					},
+				},
+			},
+		},
+	}
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `box_transactions` WHERE box_id = ?")).
+		WithArgs(boxID).
+		WillReturnError(errors.New("database error"))
+
+	count, err := boxRepository.CountBoxTransactionsByQueryFilters(queryFilter)
+
+	assert.Error(t, err)
+	assert.Empty(t, count)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
