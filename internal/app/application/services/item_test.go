@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/stub"
+	stub2 "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/stub"
 	"github.com/labstack/gommon/random"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -17,11 +18,13 @@ func TestItemServiceCreate(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	itemRepository.On("Create", mock.AnythingOfType("*entities.Item")).
@@ -74,17 +77,20 @@ func TestItemServiceCreate(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceCreateErrorOnAssetService(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	assetService.On("CreateFromFile", mock.AnythingOfType("*os.File"), mock.AnythingOfType("*entities.Item")).
@@ -116,17 +122,20 @@ func TestItemServiceCreateErrorOnAssetService(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceCreateErrorOnItemRepository(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	assetService.On("CreateFromFile", mock.AnythingOfType("*os.File"), mock.AnythingOfType("*entities.Item")).
@@ -141,10 +150,10 @@ func TestItemServiceCreateErrorOnItemRepository(t *testing.T) {
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		}, nil)
-	assetService.On("Delete", mock.AnythingOfType("*entities.Asset")).
-		Return(nil)
 	itemRepository.On("Create", mock.AnythingOfType("*entities.Item")).
 		Return(errors.New("item repository error"))
+	eventBus.On("Publish", mock.AnythingOfType("services.ItemNotCreatedEvent")).
+		Return(nil)
 
 	sku := random.String(10, random.Alphanumeric)
 	name := random.String(10, random.Alphanumeric)
@@ -167,24 +176,25 @@ func TestItemServiceCreateErrorOnItemRepository(t *testing.T) {
 		file,
 	)
 
-	time.Sleep(2 * time.Second) // Needed to wait for the goroutine to finish
-
 	assert.Error(t, err)
 	assert.Nil(t, item)
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceCreateErrorOnItemKeywordRepository(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	assetService.On("CreateFromFile", mock.AnythingOfType("*os.File"), mock.AnythingOfType("*entities.Item")).
@@ -199,12 +209,12 @@ func TestItemServiceCreateErrorOnItemKeywordRepository(t *testing.T) {
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		}, nil)
-	assetService.On("Delete", mock.AnythingOfType("*entities.Asset")).
-		Return(nil)
 	itemRepository.On("Create", mock.AnythingOfType("*entities.Item")).
 		Return(nil)
 	itemKeywordRepository.On("CreateMany", mock.AnythingOfType("[]*entities.ItemKeyword")).
 		Return(errors.New("item keyword repository error"))
+	eventBus.On("Publish", mock.AnythingOfType("services.ItemKeywordsNotCreatedEvent")).
+		Return(nil)
 
 	sku := random.String(10, random.Alphanumeric)
 	name := random.String(10, random.Alphanumeric)
@@ -227,24 +237,25 @@ func TestItemServiceCreateErrorOnItemKeywordRepository(t *testing.T) {
 		file,
 	)
 
-	time.Sleep(2 * time.Second) // Needed to wait for the goroutine to finish
-
 	assert.Error(t, err)
 	assert.Nil(t, item)
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceGetAll(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	itemRepository.On(
@@ -290,17 +301,20 @@ func TestItemServiceGetAll(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceGetAllErrorOnItemRepository(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	itemRepository.On(
@@ -320,17 +334,20 @@ func TestItemServiceGetAllErrorOnItemRepository(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceGetAllErrorOnAssetService(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	itemRepository.On(
@@ -363,17 +380,20 @@ func TestItemServiceGetAllErrorOnAssetService(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceCountAll(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	itemRepository.On(
@@ -389,17 +409,20 @@ func TestItemServiceCountAll(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceCountAllErrorOnItemRepository(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	itemRepository.On(
@@ -415,17 +438,20 @@ func TestItemServiceCountAllErrorOnItemRepository(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceUpdate(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	id := uuid.NewString()
@@ -489,17 +515,20 @@ func TestItemServiceUpdate(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceUpdateErrorOnItemRepository(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	id := uuid.NewString()
@@ -542,17 +571,20 @@ func TestItemServiceUpdateErrorOnItemRepository(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceUpdateErrorOnItemKeywordRepository(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	id := uuid.NewString()
@@ -597,17 +629,20 @@ func TestItemServiceUpdateErrorOnItemKeywordRepository(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
 
 func TestItemServiceUpdateErrorOnAssetService(t *testing.T) {
 	itemRepository := &stub.ItemRepositoryMock{}
 	itemKeywordRepository := &stub.ItemKeywordRepositoryMock{}
 	assetService := &AssetServiceMock{}
+	eventBus := new(stub2.EventBusMock)
 
 	itemService := NewItemService(
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	)
 
 	id := uuid.NewString()
@@ -656,4 +691,5 @@ func TestItemServiceUpdateErrorOnAssetService(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	itemKeywordRepository.AssertExpectations(t)
 	assetService.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
 }
