@@ -158,3 +158,39 @@ func (r *BoxRepository) Update(box *entities.Box) error {
 
 	return nil
 }
+
+func (r *BoxRepository) GetBoxTransactionsByQueryFilters(
+	queryFilter repositories.QueryFilter,
+	pageFilter *repositories.PageFilter,
+) ([]*entities.BoxTransaction, error) {
+	var boxTransactions []*entities.BoxTransaction
+	err := applyFilters(r.db, queryFilter).
+		Offset(pageFilter.Offset).
+		Limit(pageFilter.Limit).
+		Order("created_at desc").
+		Find(&boxTransactions).
+		Error
+
+	if err != nil {
+		logger.LogError(err)
+		return nil, repositories.ErrBoxRepositoryCanNotGetBoxTransactionsByQueryFilters
+	}
+
+	return boxTransactions, nil
+}
+
+func (r *BoxRepository) CountBoxTransactionsByQueryFilters(
+	queryFilter repositories.QueryFilter,
+) (int64, error) {
+	var count int64
+	err := applyFilters(r.db.Model(&entities.BoxTransaction{}), queryFilter).
+		Count(&count).
+		Error
+
+	if err != nil {
+		logger.LogError(err)
+		return 0, repositories.ErrBoxRepositoryCanNotCountBoxTransactionsByQueryFilters
+	}
+
+	return count, nil
+}
