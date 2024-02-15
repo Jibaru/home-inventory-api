@@ -376,3 +376,25 @@ func (s *BoxService) Update(
 
 	return box, nil
 }
+
+func (s *BoxService) TransferToRoom(
+	boxID string,
+	roomID string,
+) error {
+	box, err := s.boxRepository.GetByID(boxID)
+	if err != nil {
+		return err
+	}
+
+	err = box.ChangeRoomID(roomID)
+	if err != nil {
+		return err
+	}
+
+	err = s.boxRepository.Update(box)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
