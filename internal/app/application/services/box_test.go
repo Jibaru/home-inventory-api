@@ -826,3 +826,76 @@ func TestBoxServiceUpdateErrorInBoxRepositoryOnUpdate(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 }
+
+func TestBoxServiceTransferToRoom(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	roomID := uuid.NewString()
+
+	boxRepository.On("GetByID", boxID).
+		Return(&entities.Box{
+			ID: boxID,
+		}, nil)
+	boxRepository.On("Update", mock.AnythingOfType("*entities.Box")).
+		Return(nil)
+
+	err := boxService.TransferToRoom(boxID, roomID)
+
+	assert.NoError(t, err)
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceTransferToRoomErrorInBoxRepositoryOnGetByID(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	roomID := uuid.NewString()
+
+	mockError := errors.New("repository error")
+	boxRepository.On("GetByID", boxID).
+		Return(nil, mockError)
+
+	err := boxService.TransferToRoom(boxID, roomID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceTransferToRoomErrorInBoxRepositoryOnUpdate(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+	roomID := uuid.NewString()
+
+	mockError := errors.New("repository error")
+	boxRepository.On("GetByID", boxID).
+		Return(&entities.Box{}, nil)
+	boxRepository.On("Update", mock.AnythingOfType("*entities.Box")).
+		Return(mockError)
+
+	err := boxService.TransferToRoom(boxID, roomID)
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
