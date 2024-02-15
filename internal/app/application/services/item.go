@@ -3,7 +3,8 @@ package services
 import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
-	"log"
+	"github.com/jibaru/home-inventory-api/m/internal/app/domain/services"
+	"github.com/jibaru/home-inventory-api/m/logger"
 	"os"
 )
 
@@ -11,17 +12,20 @@ type ItemService struct {
 	itemRepository        repositories.ItemRepository
 	itemKeywordRepository repositories.ItemKeywordRepository
 	assetService          AssetServiceInterface
+	eventBus              services.EventBus
 }
 
 func NewItemService(
 	itemRepository repositories.ItemRepository,
 	itemKeywordRepository repositories.ItemKeywordRepository,
 	assetService AssetServiceInterface,
+	eventBus services.EventBus,
 ) *ItemService {
 	return &ItemService{
 		itemRepository,
 		itemKeywordRepository,
 		assetService,
+		eventBus,
 	}
 }
 
@@ -56,23 +60,27 @@ func (s *ItemService) Create(
 
 	err = s.itemRepository.Create(item)
 	if err != nil {
-		go func() {
-			err := s.assetService.Delete(asset)
-			if err != nil {
-				log.Println(err)
-			}
-		}()
+		err2 := s.eventBus.Publish(services.ItemNotCreatedEvent{
+			Item:  *item,
+			Asset: *asset,
+		})
+		if err2 != nil {
+			logger.LogError(err2)
+			return nil, err2
+		}
 		return nil, err
 	}
 
 	err = s.itemKeywordRepository.CreateMany(itemKeywords)
 	if err != nil {
-		go func() {
-			err := s.assetService.Delete(asset)
-			if err != nil {
-				log.Println(err)
-			}
-		}()
+		err2 := s.eventBus.Publish(services.ItemKeywordsNotCreatedEvent{
+			ItemKeywords: itemKeywords,
+			Asset:        *asset,
+		})
+		if err2 != nil {
+			logger.LogError(err)
+			return nil, err2
+		}
 		return nil, err
 	}
 
