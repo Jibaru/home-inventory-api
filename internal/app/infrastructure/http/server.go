@@ -1,12 +1,15 @@
 package http
 
 import (
+	"github.com/jibaru/home-inventory-api/m/internal/app/application/listeners"
 	"github.com/jibaru/home-inventory-api/m/internal/app/application/services"
+	domain "github.com/jibaru/home-inventory-api/m/internal/app/domain/services"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/controllers"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/http/middlewares"
 	repositories "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/gorm"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/aws"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/jwt"
+	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/memory"
 	"github.com/jibaru/home-inventory-api/m/logger"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -26,6 +29,7 @@ func RunServer(
 ) {
 	tokenGenerator := jwt.NewTokenGenerator(jwtSecret, jwtDuration)
 	fileManager := aws.NewFileManager(awsAccessKeyID, awsSecretAccessKey, awsRegion, s3BucketName)
+	eventBus := memory.NewEventBus()
 
 	assetRepository := repositories.NewAssetRepository(db)
 	versionRepository := repositories.NewVersionRepository(db)
@@ -40,8 +44,17 @@ func RunServer(
 	userService := services.NewUserService(userRepository)
 	versionService := services.NewVersionService(versionRepository)
 	roomService := services.NewRoomService(roomRepository, boxRepository)
-	boxService := services.NewBoxService(boxRepository, itemRepository, roomRepository)
-	itemService := services.NewItemService(itemRepository, itemKeywordRepository, assetService)
+	boxService := services.NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	itemService := services.NewItemService(itemRepository, itemKeywordRepository, assetService, eventBus)
+
+	createAddBoxTransactionListener := listeners.NewCreateAddBoxTransactionListener(boxService)
+	createRemoveBoxTransactionListener := listeners.NewCreateRemoveBoxTransactionListener(boxService)
+	rollbackAssetListener := listeners.NewRollbackAssetListener(assetService)
+
+	eventBus.Subscribe(domain.BoxItemAddedEvent{}, createAddBoxTransactionListener.Handle)
+	eventBus.Subscribe(domain.BoxItemRemovedEvent{}, createRemoveBoxTransactionListener.Handle)
+	eventBus.Subscribe(domain.ItemNotCreatedEvent{}, rollbackAssetListener.Handle)
+	eventBus.Subscribe(domain.ItemKeywordsNotCreatedEvent{}, rollbackAssetListener.Handle)
 
 	healthController := controllers.NewHealthController(versionService)
 	signOnController := controllers.NewSignOnController(userService)
