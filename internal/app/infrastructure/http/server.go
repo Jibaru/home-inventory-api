@@ -62,6 +62,7 @@ func RunServer(
 	updateBoxController := controllers.NewUpdateBoxController(boxService)
 	updateItemController := controllers.NewUpdateItemController(itemService)
 	changeBoxRoomController := controllers.NewChangeBoxRoomController(boxService)
+	getBoxTransactionsController := controllers.NewGetBoxTransactionsController(boxService)
 
 	loggerMiddleware := middlewares.NewLoggerMiddleware()
 	needsAuthMiddleware := middlewares.NewNeedsAuthMiddleware(authService)
@@ -91,6 +92,7 @@ func RunServer(
 	authApi.PATCH("/boxes/:boxID", updateBoxController.Handle)
 	authApi.PATCH("/items/:itemID", updateItemController.Handle)
 	authApi.PUT("/boxes/:boxID/room", changeBoxRoomController.Handle)
+	authApi.GET("/boxes/:boxID/transactions", getBoxTransactionsController.Handle)
 
 	logger.LogError(e.Start(host + ":" + port))
 }

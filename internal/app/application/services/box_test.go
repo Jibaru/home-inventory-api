@@ -899,3 +899,101 @@ func TestBoxServiceTransferToRoomErrorInBoxRepositoryOnUpdate(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 }
+
+func TestBoxServiceGetBoxTransactions(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+
+	pageFilter := PageFilter{
+		Page: 1,
+		Size: 1,
+	}
+
+	boxRepository.On("GetBoxTransactionsByQueryFilters", mock.AnythingOfType("repositories.QueryFilter"), mock.AnythingOfType("*repositories.PageFilter")).
+		Return([]*entities.BoxTransaction{}, nil)
+
+	transactions, err := boxService.GetBoxTransactions(boxID, pageFilter)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, transactions)
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceGetBoxTransactionsErrorInBoxRepositoryOnGetBoxTransactionsByQueryFilters(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+
+	pageFilter := PageFilter{
+		Page: 1,
+		Size: 1,
+	}
+
+	mockError := errors.New("repository error")
+	boxRepository.On("GetBoxTransactionsByQueryFilters", mock.AnythingOfType("repositories.QueryFilter"), mock.AnythingOfType("*repositories.PageFilter")).
+		Return(nil, mockError)
+
+	transactions, err := boxService.GetBoxTransactions(boxID, pageFilter)
+
+	assert.Error(t, err)
+	assert.Nil(t, transactions)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceCountBoxTransactions(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+
+	boxRepository.On("CountBoxTransactionsByQueryFilters", mock.AnythingOfType("repositories.QueryFilter")).
+		Return(int64(1), nil)
+
+	count, err := boxService.CountBoxTransactions(boxID)
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(1), count)
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}
+
+func TestBoxServiceCountBoxTransactionsErrorInBoxRepositoryOnCountBoxTransactionsByQueryFilters(t *testing.T) {
+	boxRepository := new(stub.BoxRepositoryMock)
+	roomRepository := new(stub.RoomRepositoryMock)
+	itemRepository := new(stub.ItemRepositoryMock)
+
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository)
+
+	boxID := uuid.NewString()
+
+	mockError := errors.New("repository error")
+	boxRepository.On("CountBoxTransactionsByQueryFilters", mock.AnythingOfType("repositories.QueryFilter")).
+		Return(int64(0), mockError)
+
+	count, err := boxService.CountBoxTransactions(boxID)
+
+	assert.Error(t, err)
+	assert.Equal(t, int64(0), count)
+	assert.EqualError(t, err, mockError.Error())
+	boxRepository.AssertExpectations(t)
+	itemRepository.AssertExpectations(t)
+	roomRepository.AssertExpectations(t)
+}

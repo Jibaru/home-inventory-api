@@ -92,3 +92,23 @@ func (m *BoxRepositoryMock) Update(box *entities.Box) error {
 	args := m.Called(box)
 	return args.Error(0)
 }
+
+func (m *BoxRepositoryMock) GetBoxTransactionsByQueryFilters(
+	queryFilter repositories.QueryFilter,
+	pageFilter *repositories.PageFilter,
+) ([]*entities.BoxTransaction, error) {
+	args := m.Called(queryFilter, pageFilter)
+
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
+	return args.Get(0).([]*entities.BoxTransaction), args.Error(1)
+}
+
+func (m *BoxRepositoryMock) CountBoxTransactionsByQueryFilters(
+	queryFilter repositories.QueryFilter,
+) (int64, error) {
+	args := m.Called(queryFilter)
+	return args.Get(0).(int64), args.Error(1)
+}
