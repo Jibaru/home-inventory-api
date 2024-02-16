@@ -29,8 +29,10 @@ The API use AWS S3 to store the assets.
 
 1. Clone the repository
 2. Clone `app.env.example` to `app.env` and fill the environment variables
-3. Run `docker-compose up` to start the app or if you use make, then use of the `Makefile` commands
-4. Access the API at `http://0.0.0.0:your-port`
+3. Run `docker-compose --env-file app.env up` to start the app or if you use make, then use of the `Makefile` commands
+4. Run `docker exec -it home-inventory-api-workspace-1 /bin/bash -c "make run"` to start running the API
+5. Also you must need run migrations on your database
+6. Access the API at `http://0.0.0.0:your-port`
 
 ## Business Keywords
 
@@ -96,7 +98,7 @@ There are interesting services in domain layer:
 
 On the infrastructure layer, the implementation of the interfaces is done. The implementation is done using the database, the email service, the file storage, etc.
 
-Here is where the API is implemented. The API is implemented using the `gorm` framework.
+Here is where the API is implemented. The API is implemented using the `echo` framework, and the persistence with `gorm`.
 
 There are two features that cross the entire layers. There are the logger and notifier (sentry).
 
