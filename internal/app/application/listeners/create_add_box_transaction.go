@@ -28,6 +28,18 @@ func (l *CreateAddBoxTransactionListener) Handle(event domain.Event) {
 		)
 		if err != nil {
 			logger.LogError(err)
+			return
+		}
+
+		err = l.boxService.NotifyBoxItemAdded(
+			e.Quantity,
+			e.BoxID,
+			e.Item,
+			e.HappenedAt,
+		)
+		if err != nil {
+			logger.LogError(err)
+			return
 		}
 	}
 }
