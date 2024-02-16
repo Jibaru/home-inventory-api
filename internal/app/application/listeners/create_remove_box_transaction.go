@@ -19,15 +19,27 @@ func NewCreateRemoveBoxTransactionListener(
 }
 
 func (l *CreateRemoveBoxTransactionListener) Handle(event domain.Event) {
-	if event, ok := event.(domain.BoxItemRemovedEvent); ok {
+	if e, ok := event.(domain.BoxItemRemovedEvent); ok {
 		_, err := l.boxService.CreateRemoveBoxTransaction(
-			event.Quantity,
-			event.BoxID,
-			event.Item,
-			event.HappenedAt,
+			e.Quantity,
+			e.BoxID,
+			e.Item,
+			e.HappenedAt,
 		)
 		if err != nil {
 			logger.LogError(err)
+			return
+		}
+
+		err = l.boxService.NotifyBoxItemRemoved(
+			e.Quantity,
+			e.BoxID,
+			e.Item,
+			e.HappenedAt,
+		)
+		if err != nil {
+			logger.LogError(err)
+			return
 		}
 	}
 }

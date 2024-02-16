@@ -44,3 +44,23 @@ func (r *UserRepository) FindByEmail(email string) (*entities.User, error) {
 
 	return user, nil
 }
+
+func (r *UserRepository) GetUserByBoxID(boxID string) (*entities.User, error) {
+	user := &entities.User{}
+
+	err := r.db.Joins("rooms on rooms.user_id = users.id").
+		Joins("boxes on boxes.room_id = rooms.id").
+		Where("boxes.id = ?", boxID).
+		First(user).
+		Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		logger.LogError(err)
+		return nil, repositories.ErrUserRepositoryUserNotFound
+	}
+
+	if err != nil {
+		return nil, repositories.ErrUserRepositoryCanNotGetUserByBoxID
+	}
+
+	return user, nil
+}

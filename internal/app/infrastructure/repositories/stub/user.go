@@ -23,3 +23,13 @@ func (m *UserRepositoryMock) FindByEmail(email string) (*entities.User, error) {
 
 	return nil, args.Error(1)
 }
+
+func (m *UserRepositoryMock) GetUserByBoxID(boxID string) (*entities.User, error) {
+	args := m.Called(boxID)
+
+	if args.Get(0) != nil {
+		return args.Get(0).(*entities.User), args.Error(1)
+	}
+
+	return nil, args.Error(1)
+}

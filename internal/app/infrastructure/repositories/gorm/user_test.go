@@ -118,3 +118,61 @@ func TestUserRepositoryFindByEmailErrorUserNotFound(t *testing.T) {
 	err = dbMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestUserRepositoryGetUserByBoxID(t *testing.T) {
+	db, dbMock := makeDBMock()
+	userRepository := NewUserRepository(db)
+
+	boxID := uuid.NewString()
+
+	expectedUser := entities.User{
+		ID:        uuid.NewString(),
+		Email:     "email@test.com",
+		Password:  "encryptedPassword",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "email", "password", "created_at", "updated_at"}).
+		AddRow(
+			expectedUser.ID,
+			expectedUser.Email,
+			expectedUser.Password,
+			expectedUser.CreatedAt,
+			expectedUser.UpdatedAt,
+		)
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT `users`.`id`,`users`.`email`,`users`.`password`,`users`.`created_at`,`users`.`updated_at` FROM `users` rooms on rooms.user_id = users.id boxes on boxes.room_id = rooms.id WHERE boxes.id = ? ORDER BY `users`.`id` LIMIT 1")).
+		WithArgs(boxID).
+		WillReturnRows(rows)
+
+	user, err := userRepository.GetUserByBoxID(boxID)
+
+	assert.NotNil(t, user)
+	assert.Equal(t, expectedUser.ID, user.ID)
+	assert.Equal(t, expectedUser.Email, user.Email)
+	assert.Equal(t, expectedUser.Password, user.Password)
+	assert.Equal(t, expectedUser.CreatedAt, user.CreatedAt)
+	assert.Equal(t, expectedUser.UpdatedAt, user.UpdatedAt)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestUserRepositoryGetUserByBoxIDErrorUserNotFound(t *testing.T) {
+	db, dbMock := makeDBMock()
+	userRepository := NewUserRepository(db)
+
+	boxID := uuid.NewString()
+
+	dbMock.ExpectQuery(regexp.QuoteMeta("SELECT `users`.`id`,`users`.`email`,`users`.`password`,`users`.`created_at`,`users`.`updated_at` FROM `users` rooms on rooms.user_id = users.id boxes on boxes.room_id = rooms.id WHERE boxes.id = ? ORDER BY `users`.`id` LIMIT 1")).
+		WithArgs(boxID).
+		WillReturnError(gorm.ErrRecordNotFound)
+
+	user, err := userRepository.GetUserByBoxID(boxID)
+
+	assert.Nil(t, user)
+	assert.Error(t, err)
+	assert.ErrorIs(t, repositories.ErrUserRepositoryUserNotFound, err)
+	err = dbMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
