@@ -8,6 +8,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/http/middlewares"
 	repositories "github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/repositories/gorm"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/aws"
+	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/gmail"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/jwt"
 	"github.com/jibaru/home-inventory-api/m/internal/app/infrastructure/services/memory"
 	"github.com/jibaru/home-inventory-api/m/logger"
@@ -25,10 +26,15 @@ func RunServer(
 	awsSecretAccessKey string,
 	awsRegion string,
 	s3BucketName string,
+	smtpHost string,
+	smtpPort int,
+	smtpEmail string,
+	smtpPassword string,
 	db *gorm.DB,
 ) {
 	tokenGenerator := jwt.NewTokenGenerator(jwtSecret, jwtDuration)
 	fileManager := aws.NewFileManager(awsAccessKeyID, awsSecretAccessKey, awsRegion, s3BucketName)
+	mailSender := gmail.NewMailSender(smtpHost, smtpPort, smtpEmail, smtpPassword)
 	eventBus := memory.NewEventBus()
 
 	assetRepository := repositories.NewAssetRepository(db)
@@ -44,7 +50,14 @@ func RunServer(
 	userService := services.NewUserService(userRepository)
 	versionService := services.NewVersionService(versionRepository)
 	roomService := services.NewRoomService(roomRepository, boxRepository)
-	boxService := services.NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	boxService := services.NewBoxService(
+		boxRepository,
+		itemRepository,
+		roomRepository,
+		userRepository,
+		eventBus,
+		mailSender,
+	)
 	itemService := services.NewItemService(itemRepository, itemKeywordRepository, assetService, eventBus)
 
 	createAddBoxTransactionListener := listeners.NewCreateAddBoxTransactionListener(boxService)
