@@ -5,6 +5,7 @@ import (
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/entities"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/repositories"
 	"github.com/jibaru/home-inventory-api/m/internal/app/domain/services"
+	"strconv"
 	"time"
 )
 
@@ -17,20 +18,26 @@ type BoxService struct {
 	boxRepository  repositories.BoxRepository
 	itemRepository repositories.ItemRepository
 	roomRepository repositories.RoomRepository
+	userRepository repositories.UserRepository
 	eventBus       services.EventBus
+	mailSender     services.MailSender
 }
 
 func NewBoxService(
 	boxRepository repositories.BoxRepository,
 	itemRepository repositories.ItemRepository,
 	roomRepository repositories.RoomRepository,
+	userRepository repositories.UserRepository,
 	eventBus services.EventBus,
+	mailSender services.MailSender,
 ) *BoxService {
 	return &BoxService{
 		boxRepository,
 		itemRepository,
 		roomRepository,
+		userRepository,
 		eventBus,
+		mailSender,
 	}
 }
 
@@ -448,4 +455,58 @@ func (s *BoxService) makeGetBoxTransactionsQueryFilter(
 			},
 		},
 	}
+}
+
+func (s *BoxService) NotifyBoxItemAdded(
+	quantity float64,
+	boxID string,
+	item entities.Item,
+	happenedAt time.Time,
+) error {
+	user, err := s.userRepository.GetUserByBoxID(boxID)
+	if err != nil {
+		return err
+	}
+
+	quantityStr := strconv.FormatFloat(quantity, 'f', -1, 64)
+
+	body := quantityStr + " " + item.Name + " added into box " + boxID + " at " + happenedAt.String()
+
+	err = s.mailSender.SendMail(
+		user.Email,
+		"Item added into box "+boxID,
+		body,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *BoxService) NotifyBoxItemRemoved(
+	quantity float64,
+	boxID string,
+	item entities.Item,
+	happenedAt time.Time,
+) error {
+	user, err := s.userRepository.GetUserByBoxID(boxID)
+	if err != nil {
+		return err
+	}
+
+	quantityStr := strconv.FormatFloat(quantity, 'f', -1, 64)
+
+	body := quantityStr + " " + item.Name + " removed from box " + boxID + " at " + happenedAt.String()
+
+	err = s.mailSender.SendMail(
+		user.Email,
+		"Item removed from box "+boxID,
+		body,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
