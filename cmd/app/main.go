@@ -46,6 +46,10 @@ func main() {
 		config.AwsSecretAccessKey,
 		config.AwsRegion,
 		config.S3BucketName,
+		config.SmtpHost,
+		config.SmtpPort,
+		config.SmtpEmail,
+		config.SmtpPassword,
 		db,
 	)
 }
