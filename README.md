@@ -25,6 +25,8 @@ The API uses smtp to send emails to users.
 The API uses JWT to authenticate users.
 The API use AWS S3 to store the assets.
 
+[![See Documentation](https://img.shields.io/badge/-API_Documentation-orange?style=flat-square&logo=Postman&logoColor=white&link=https://documenter.getpostman.com/view/11001992/2sA2r6ZQrq)](https://documenter.getpostman.com/view/11001992/2sA2r6ZQrq)
+
 ## Get Started
 
 1. Clone the repository
