@@ -19,6 +19,10 @@ type AppConfig struct {
 	AwsRegion          string `mapstructure:"AWS_REGION"`
 	S3BucketName       string `mapstructure:"S3_BUCKET_NAME"`
 	SentryDSN          string `mapstructure:"SENTRY_DSN"`
+	SmtpHost           string `mapstructure:"SMTP_HOST"`
+	SmtpPort           int    `mapstructure:"SMTP_PORT"`
+	SmtpEmail          string `mapstructure:"SMTP_EMAIL"`
+	SmtpPassword       string `mapstructure:"SMTP_PASSWORD"`
 }
 
 func ReadConfig() (*AppConfig, error) {
