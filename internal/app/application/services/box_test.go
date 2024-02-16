@@ -18,7 +18,9 @@ func TestBoxServiceCreateBox(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	name := random.String(100, random.Alphanumeric)
 	description := random.String(255, random.Alphanumeric)
@@ -39,7 +41,9 @@ func TestBoxServiceCreateBox(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceCreateBoxErrorInRoomRepository(t *testing.T) {
@@ -47,7 +51,9 @@ func TestBoxServiceCreateBoxErrorInRoomRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	name := random.String(100, random.Alphanumeric)
 	roomID := uuid.NewString()
@@ -64,7 +70,9 @@ func TestBoxServiceCreateBoxErrorInRoomRepository(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceCreateBoxErrorInBoxRepository(t *testing.T) {
@@ -72,7 +80,9 @@ func TestBoxServiceCreateBoxErrorInBoxRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	name := random.String(100, random.Alphanumeric)
 	roomID := uuid.NewString()
@@ -91,7 +101,9 @@ func TestBoxServiceCreateBoxErrorInBoxRepository(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceAddItemIntoBoxWhenThereIsNoBoxItem(t *testing.T) {
@@ -99,7 +111,9 @@ func TestBoxServiceAddItemIntoBoxWhenThereIsNoBoxItem(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	quantity := 1.0
 	boxID := uuid.NewString()
@@ -126,7 +140,9 @@ func TestBoxServiceAddItemIntoBoxWhenThereIsNoBoxItem(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceAddItemIntoBoxWhenThereIsBoxItem(t *testing.T) {
@@ -134,7 +150,9 @@ func TestBoxServiceAddItemIntoBoxWhenThereIsBoxItem(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	quantity := 1.0
 	boxID := uuid.NewString()
@@ -165,7 +183,9 @@ func TestBoxServiceAddItemIntoBoxWhenThereIsBoxItem(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceAddItemIntoBoxErrorInItemRepository(t *testing.T) {
@@ -173,7 +193,9 @@ func TestBoxServiceAddItemIntoBoxErrorInItemRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	quantity := 1.0
 	boxID := uuid.NewString()
@@ -191,7 +213,9 @@ func TestBoxServiceAddItemIntoBoxErrorInItemRepository(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnCreateBoxItem(t *testing.T) {
@@ -199,7 +223,9 @@ func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnCreateBoxItem(t *testing.
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	quantity := 1.0
 	boxID := uuid.NewString()
@@ -223,7 +249,9 @@ func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnCreateBoxItem(t *testing.
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnUpdateBoxItem(t *testing.T) {
@@ -231,7 +259,9 @@ func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnUpdateBoxItem(t *testing.
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	quantity := 1.0
 	boxID := uuid.NewString()
@@ -259,7 +289,9 @@ func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnUpdateBoxItem(t *testing.
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnGetBoxItem(t *testing.T) {
@@ -267,7 +299,9 @@ func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnGetBoxItem(t *testing.T) 
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	quantity := 1.0
 	boxID := uuid.NewString()
@@ -289,7 +323,9 @@ func TestBoxServiceAddItemIntoBoxErrorInBoxRepositoryOnGetBoxItem(t *testing.T) 
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceRemoveItemFromBoxDeleteBoxItem(t *testing.T) {
@@ -297,7 +333,9 @@ func TestBoxServiceRemoveItemFromBoxDeleteBoxItem(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	itemID := uuid.NewString()
@@ -324,7 +362,9 @@ func TestBoxServiceRemoveItemFromBoxDeleteBoxItem(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceRemoveItemFromBoxUpdateBoxItem(t *testing.T) {
@@ -332,7 +372,9 @@ func TestBoxServiceRemoveItemFromBoxUpdateBoxItem(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	itemID := uuid.NewString()
@@ -359,7 +401,9 @@ func TestBoxServiceRemoveItemFromBoxUpdateBoxItem(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceRemoveItemFromBoxErrorInItemRepository(t *testing.T) {
@@ -367,7 +411,9 @@ func TestBoxServiceRemoveItemFromBoxErrorInItemRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	itemID := uuid.NewString()
@@ -384,7 +430,9 @@ func TestBoxServiceRemoveItemFromBoxErrorInItemRepository(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnGetBoxItem(t *testing.T) {
@@ -392,7 +440,9 @@ func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnGetBoxItem(t *testing.
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	itemID := uuid.NewString()
@@ -413,7 +463,9 @@ func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnGetBoxItem(t *testing.
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnDeleteBoxItem(t *testing.T) {
@@ -421,7 +473,9 @@ func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnDeleteBoxItem(t *testi
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	itemID := uuid.NewString()
@@ -448,7 +502,9 @@ func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnDeleteBoxItem(t *testi
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnUpdateBoxItem(t *testing.T) {
@@ -456,7 +512,9 @@ func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnUpdateBoxItem(t *testi
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	itemID := uuid.NewString()
@@ -483,7 +541,9 @@ func TestBoxServiceRemoveItemFromBoxErrorInBoxRepositoryOnUpdateBoxItem(t *testi
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceGetAll(t *testing.T) {
@@ -491,7 +551,9 @@ func TestBoxServiceGetAll(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	roomID := uuid.NewString()
 	userID := uuid.NewString()
@@ -524,7 +586,9 @@ func TestBoxServiceGetAll(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceGetAllErrorInBoxRepository(t *testing.T) {
@@ -532,7 +596,9 @@ func TestBoxServiceGetAllErrorInBoxRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	roomID := uuid.NewString()
 	userID := uuid.NewString()
@@ -559,7 +625,9 @@ func TestBoxServiceGetAllErrorInBoxRepository(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceCountAll(t *testing.T) {
@@ -567,7 +635,9 @@ func TestBoxServiceCountAll(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	roomID := uuid.NewString()
 	userID := uuid.NewString()
@@ -587,7 +657,9 @@ func TestBoxServiceCountAll(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceCountAllErrorInBoxRepository(t *testing.T) {
@@ -595,7 +667,9 @@ func TestBoxServiceCountAllErrorInBoxRepository(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	roomID := uuid.NewString()
 	userID := uuid.NewString()
@@ -616,7 +690,9 @@ func TestBoxServiceCountAllErrorInBoxRepository(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceTransferItem(t *testing.T) {
@@ -624,7 +700,9 @@ func TestBoxServiceTransferItem(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	originBoxID := uuid.NewString()
 	destinationBoxID := uuid.NewString()
@@ -661,7 +739,9 @@ func TestBoxServiceTransferItem(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceDeleteWithTransactionsAndItemQuantities(t *testing.T) {
@@ -669,7 +749,9 @@ func TestBoxServiceDeleteWithTransactionsAndItemQuantities(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 
@@ -686,7 +768,9 @@ func TestBoxServiceDeleteWithTransactionsAndItemQuantities(t *testing.T) {
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOnDeleteBoxTransactionsByBoxID(t *testing.T) {
@@ -694,7 +778,9 @@ func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOn
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 
@@ -709,7 +795,9 @@ func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOn
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOnDeleteBoxItemsByBoxID(t *testing.T) {
@@ -717,7 +805,9 @@ func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOn
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 
@@ -734,7 +824,9 @@ func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOn
 	boxRepository.AssertExpectations(t)
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOnDeleteBox(t *testing.T) {
@@ -742,7 +834,9 @@ func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOn
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 
@@ -762,6 +856,12 @@ func TestBoxServiceDeleteWithTransactionsAndItemQuantitiesErrorInBoxRepositoryOn
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceUpdate(t *testing.T) {
@@ -769,7 +869,9 @@ func TestBoxServiceUpdate(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	name := "box"
@@ -795,6 +897,9 @@ func TestBoxServiceUpdate(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceUpdateErrorInBoxRepositoryOnGetByID(t *testing.T) {
@@ -802,7 +907,9 @@ func TestBoxServiceUpdateErrorInBoxRepositoryOnGetByID(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	name := "box"
@@ -821,6 +928,9 @@ func TestBoxServiceUpdateErrorInBoxRepositoryOnGetByID(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceUpdateErrorInBoxRepositoryOnUpdate(t *testing.T) {
@@ -828,7 +938,9 @@ func TestBoxServiceUpdateErrorInBoxRepositoryOnUpdate(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	name := "box"
@@ -853,6 +965,9 @@ func TestBoxServiceUpdateErrorInBoxRepositoryOnUpdate(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceTransferToRoom(t *testing.T) {
@@ -860,7 +975,9 @@ func TestBoxServiceTransferToRoom(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	roomID := uuid.NewString()
@@ -879,6 +996,9 @@ func TestBoxServiceTransferToRoom(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceTransferToRoomErrorInBoxRepositoryOnGetByID(t *testing.T) {
@@ -886,7 +1006,9 @@ func TestBoxServiceTransferToRoomErrorInBoxRepositoryOnGetByID(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	roomID := uuid.NewString()
@@ -903,6 +1025,9 @@ func TestBoxServiceTransferToRoomErrorInBoxRepositoryOnGetByID(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceTransferToRoomErrorInBoxRepositoryOnUpdate(t *testing.T) {
@@ -910,7 +1035,9 @@ func TestBoxServiceTransferToRoomErrorInBoxRepositoryOnUpdate(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 	roomID := uuid.NewString()
@@ -929,6 +1056,9 @@ func TestBoxServiceTransferToRoomErrorInBoxRepositoryOnUpdate(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceGetBoxTransactions(t *testing.T) {
@@ -936,7 +1066,9 @@ func TestBoxServiceGetBoxTransactions(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 
@@ -956,6 +1088,9 @@ func TestBoxServiceGetBoxTransactions(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceGetBoxTransactionsErrorInBoxRepositoryOnGetBoxTransactionsByQueryFilters(t *testing.T) {
@@ -963,7 +1098,9 @@ func TestBoxServiceGetBoxTransactionsErrorInBoxRepositoryOnGetBoxTransactionsByQ
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 
@@ -985,6 +1122,9 @@ func TestBoxServiceGetBoxTransactionsErrorInBoxRepositoryOnGetBoxTransactionsByQ
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceCountBoxTransactions(t *testing.T) {
@@ -992,7 +1132,9 @@ func TestBoxServiceCountBoxTransactions(t *testing.T) {
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 
@@ -1007,6 +1149,9 @@ func TestBoxServiceCountBoxTransactions(t *testing.T) {
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
 
 func TestBoxServiceCountBoxTransactionsErrorInBoxRepositoryOnCountBoxTransactionsByQueryFilters(t *testing.T) {
@@ -1014,7 +1159,9 @@ func TestBoxServiceCountBoxTransactionsErrorInBoxRepositoryOnCountBoxTransaction
 	roomRepository := new(stub.RoomRepositoryMock)
 	itemRepository := new(stub.ItemRepositoryMock)
 	eventBus := new(domainstub.EventBusMock)
-	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, eventBus)
+	userRepository := new(stub.UserRepositoryMock)
+	mailSender := new(domainstub.MailSenderMock)
+	boxService := NewBoxService(boxRepository, itemRepository, roomRepository, userRepository, eventBus, mailSender)
 
 	boxID := uuid.NewString()
 
@@ -1031,4 +1178,7 @@ func TestBoxServiceCountBoxTransactionsErrorInBoxRepositoryOnCountBoxTransaction
 	itemRepository.AssertExpectations(t)
 	roomRepository.AssertExpectations(t)
 	eventBus.AssertExpectations(t)
+	userRepository.AssertExpectations(t)
+	eventBus.AssertExpectations(t)
+	mailSender.AssertExpectations(t)
 }
